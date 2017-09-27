@@ -1,0 +1,25 @@
+{
+  "name": "lunch-box-express",
+  "version": "0.0.1",
+  "description": "lunch",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TroyCode/lunch-box-express.git"
+  },
+  "keywords": [
+    "lunch"
+  ],
+  "author": "104di17b",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TroyCode/lunch-box-express/issues"
+  },
+  "homepage": "https://github.com/TroyCode/lunch-box-express#readme",
+  "dependencies": {
+    "express": "^4.15.5"
+  }
+}
