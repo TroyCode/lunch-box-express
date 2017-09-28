@@ -21,6 +21,7 @@
   "homepage": "https://github.com/TroyCode/lunch-box-express#readme",
   "dependencies": {
     "express": "^4.15.5",
-    "mysql": "^2.14.1"
+    "mysql": "^2.14.1",
+    "nodemon": "^1.12.1"
   }
 }

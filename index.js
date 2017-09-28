@@ -34,8 +34,8 @@ app.use(express.static(path.join(__dirname, 'public')))
 //   console.log('fields: ', fields);
 // // });
 // connection.end();
-app.get('/login', function(){
-
+app.get('/login', function(req, res){
+  res.send('123')
 })
 
 
