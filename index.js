@@ -13,7 +13,13 @@ app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')))
 app.set('views', path.join(__dirname, 'views'))
 app.use(session({ secret: 'I_AM_5ECRE7', resave: true, saveUninitialized: false, cookie: { path: '/', httpOnly: true, maxAge: null }}))
-
+var connection = mysql.createConnection({
+		host     : 'localhost',
+		user     : 'root',
+		password : '12345678',
+		database : 'lunch'
+	});
+connection.connect();
 
 function checkLogin(req, res, next) {
   if (!req.session.username) {
@@ -22,6 +28,54 @@ function checkLogin(req, res, next) {
     next();
   }
 }
+
+var restaurant_list = function () {
+	connection.query('SELECT * FROM restaurant', function(err, results, fields) {
+		if (err) { 
+			throw err
+		}
+		if (results.length !== 0) {
+			console.log(results)
+			return results
+		}else {
+			console.log('nothing')
+			return []
+		}	
+	});
+}
+
+var item_list = function (res_id) {
+	connection.query('SELECT * FROM item WHERE restaurant_id = ?', res_id, function(err, results, fields) {
+		if (err) { 
+			throw err
+		}
+		if (results.length !== 0) {
+			console.log(results)
+			return results
+		}else {
+			console.log('nothing')
+			return []
+		}	
+	});
+}
+
+var type_list = function (res_id) {
+	connection.query('SELECT item_type.* FROM item_type WHERE item_type.id in (SELECT item.type_id from item WHERE item.res_id = ?)', res_id, function(err, results, fields) {
+		if (err) { 
+			throw err
+		}
+		if (results.length !== 0) {
+			console.log(results)
+			return results
+		}else {
+			console.log('nothing')
+			return []
+		}	
+	});
+}
+
+
+
 // var ac = {
 // 	name: 'dragon',
 // 	password: '12345678',
@@ -44,6 +98,8 @@ function checkLogin(req, res, next) {
 // // });
 // connection.end();
 
+
+
 app.get('/', checkLogin, function(req, res){
 	res.end('logined')
 })
@@ -65,13 +121,7 @@ app.get('/logout', function(req, res){
 app.post('/login', function(req, res){
 	console.log(req.body)
 	console.log('username session: ' + req.session.username)
-	var connection = mysql.createConnection({
-		host     : 'localhost',
-		user     : 'root',
-		password : '12345678',
-		database : 'lunch'
-	});
-	connection.connect();
+	
 	connection.query('SELECT * FROM account WHERE name = ?', req.body.username, function(err, results, fields) {
 		if (err) { 
 			throw err
@@ -87,9 +137,14 @@ app.post('/login', function(req, res){
 			res.end('forbidden')
 		}	
 	});
-	connection.end();
+	// connection.end();
 })
 
+app.get('/create', checkLogin,function(req, res){
+	var res_list = restaurant_list()
+	console.log(res_list)
+	res.end('123')
+})
 
 app.listen(8888, () => {
 	console.log('server up on port 8888')
