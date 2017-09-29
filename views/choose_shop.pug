@@ -1,7 +1,18 @@
-doctype html
-html
-	head
-		link(rel='stylesheet', type='text/css', href='css/main.css')
-		script(src='https://code.jquery.com/jquery-3.2.1.min.js')
-	body
-		script(src='js/choose_shop.js')
+each e in res
+	div(class='body_div', id=e.id)
+		p=e.name 
+		p=e.address
+		p=e.phone
+
+script.
+	$('.body_div').click(function(){
+	var clicknum=name;
+	$.ajax({
+		url:'/menu_details',
+		type:'GET',
+		success:function(url){
+			$('.main_body').html(url);
+		}
+	});
+	return false;
+	});
