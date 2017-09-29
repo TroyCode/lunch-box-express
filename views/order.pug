@@ -1,1 +1,7 @@
 H1 #{event_list[0].name}
+
+ul
+	each val in event_list
+		li= val.name
+		li= val.end_time
+		li= val.organizer
