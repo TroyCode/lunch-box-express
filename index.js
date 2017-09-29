@@ -72,13 +72,7 @@ app.get('/logout', function(req, res){
 app.post('/login', function(req, res){
 	console.log(req.body)
 	console.log('username session: ' + req.session.username)
-	var connection = mysql.createConnection({
-		host     : 'localhost',
-		user     : 'root',
-		password : '12345678',
-		database : 'lunch'
-	});
-	connection.connect();
+
 	connection.query('SELECT * FROM account WHERE name = ?', req.body.username, function(err, results, fields) {
 		if (err) { 
 			throw err
