@@ -1,13 +1,11 @@
-doctype html
-html
-    head
-        link(rel='stylesheet', type='text/css', href='css/main.css')
-        script(src='https://code.jquery.com/jquery-3.2.1.min.js')
-    body
+head
+    link(rel='stylesheet', type='text/css', href='css/main.css')
+    script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+body
         .top_menu
             ul.top_menu_text
-                h5
-                    |保證好吃
+                h5#user_name
+                h5#user_email
             div(style='height:1px;width:100%;background-color:black;')
             .top_iframe
                 ul(style='margin-top:10px;')
@@ -20,9 +18,6 @@ html
 
         .bottom_menu
             h5 熱門店家
-
-        script(src='js/main.js')
-
         script.
            $("#choose_shop").click(function(){
                $.ajax({
@@ -45,3 +40,13 @@ html
                });
                 return false;
             });
+            $(document).ready(function() {
+                $.ajaxSetup({
+                    async: false
+                    }); 
+                    var url='json/main.json';
+                    $.getJSON(url,{},function(data){
+                        $("#user_name").text(data.user.name);
+                        $("#user_email").text(data.user.email);
+                        });
+                        });

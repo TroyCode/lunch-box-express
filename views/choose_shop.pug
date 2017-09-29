@@ -1,18 +1,16 @@
-each e in res
-	div(class='body_div', id=e.id)
-		p=e.name 
-		p=e.address
-		p=e.phone
-
-script.
-	$('.body_div').click(function(){
-	var clicknum=name;
-	$.ajax({
-		url:'/menu_details',
-		type:'GET',
-		success:function(url){
-			$('.main_body').html(url);
-		}
-	});
-	return false;
-	});
+-let reslist=[['麥當勞','b', 'c', 'd', 'e'],['1','2','3','4','5']]
+	each val in reslist
+		.body_div=('店名：'+val[0]+'  '+'地址:'+val[1])
+		script.
+			$('.body_div').click(function(){
+				var clicknum=name;
+				var name = "#{reslist}";
+				$.ajax({
+					url:'/menu_details/',
+					type:'GET',
+					success:function(url){
+						$('.main_body').html(url);
+						}
+						});
+						return false;
+						});
