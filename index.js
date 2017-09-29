@@ -100,9 +100,7 @@ var type_list = function (res_id) {
 
 
 
-app.get('/', checkLogin, function(req, res){
-	res.end('logined')
-})
+
 
 app.get('/login', function(req, res){
 	if (!req.session.username) {
@@ -140,11 +138,52 @@ app.post('/login', function(req, res){
 	// connection.end();
 })
 
-app.get('/create', checkLogin,function(req, res){
+app.get('/create', checkLogin, function(req, res){
 	var res_list = restaurant_list()
 	console.log(res_list)
-	res.end('123')
+	res.render('choose_shop', {})
 })
+
+
+
+
+
+
+
+
+app.get("/", checkLogin, function(req,res,next){
+    //抓取submit的資料 url上會有顯示    
+    res.render('index');
+    //res.send(result.toString());
+    // cookie 最大 4KB
+    //send 字串
+    
+});
+app.get("/order", checkLogin, function(req,res,next){
+    console.log(req.query.name);
+    res.render('order.pug');    
+});
+app.get("/initiate", checkLogin, function(req,res,next){
+    res.render('initiate.pug'); 
+});
+app.get("/overview", checkLogin, function(req,res,next){
+    res.render('overview.pug'); 
+});
+app.get("/new_menu", checkLogin, function(req,res,next){
+    res.render('new_menu.pug'); 
+});
+app.get("/old_menu", checkLogin, function(req,res,next){
+    res.render('old_menu.pug'); 
+});
+app.get("/choose_shop", checkLogin, function(req,res,next){
+    res.render('choose_shop.pug'); 
+});
+app.get("/menu_details", checkLogin, function(req,res,next){
+    res.render('menu_details.pug');
+});
+
+
+
 
 app.listen(8888, () => {
 	console.log('server up on port 8888')
