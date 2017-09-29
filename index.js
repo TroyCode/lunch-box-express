@@ -14,6 +14,13 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.set('views', path.join(__dirname, 'views'))
 app.use(session({ secret: 'I_AM_5ECRE7', resave: true, saveUninitialized: false, cookie: { path: '/', httpOnly: true, maxAge: null }}))
 
+var connection = mysql.createConnection({
+  host     : 'localhost',
+  user     : 'root',
+  password : '12345678',
+  database : 'lunch'
+});
+connection.connect();
 
 function checkLogin(req, res, next) {
   if (!req.session.username) {
@@ -88,6 +95,17 @@ app.post('/login', function(req, res){
 		}	
 	});
 	connection.end();
+})
+
+app.get('/order', (req, res) => {
+	let sql = 'SELECT a.name organizer, r.name, e.end_time FROM event e \
+					   JOIN account a ON e.account_id = a.id \
+					   JOIN restaurant r ON e.restaurant_id = r.id;' 
+	connection.query(sql, (err, results) => {
+		if (err) throw err
+		res.render('order', {event_list:results})
+		console.log(results)
+	});
 })
 
 
