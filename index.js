@@ -84,7 +84,16 @@ var item_list = function (res_id) {
 	
 }
 
-
+var get_event = event_id => {
+	let sql = 'SELECT * FROM event \
+						 WHERE id = ' + event_id + ';'
+	return new Promise((resolve, reject) => {
+		connection.query(sql, (err, results) => {
+			if (err) throw err
+			resolve(results[0])
+		})
+	})
+}
 
 
 // var ac = {
@@ -162,6 +171,30 @@ app.get('/order', (req, res) => {
 	});
 })
 
+app.get('/order/:event_id', (req, res) => {
+	// {
+	// 	event: {
+	// 		org_id: 1, 
+	// 		res_id:31, 
+	// 		end_time:2017-09-28 15:17:22
+	// 	},
+	// 	menu: {
+	// 		漢堡: [{id: 364, name: '麥香雞', price: 35}],
+	// 		飲料: [{id: 408, name: '奶茶(中)', price: 20}]
+	// 	}
+	// }
+	get_event(req.params.event_id).then(event => {
+		let event_detail = {
+			org_id: event.account_id,
+			res_id: event.restaurant_id,
+			end_time: event.end_time
+		}
+		get_menu(event_detail.res_id).then(menu => {
+			console.log({event: event_detail, menu: menu})
+			res.render('order_detail', {event: event_detail, menu: menu})
+		})
+	})
+})
 
 
 
