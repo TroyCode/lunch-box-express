@@ -15,11 +15,11 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(session({ secret: 'I_AM_5ECRE7', resave: true, saveUninitialized: false, cookie: { path: '/', httpOnly: true, maxAge: null }}))
 
 var connection = mysql.createConnection({
-  host     : 'localhost',
-  user     : 'root',
-  password : '12345678',
-  database : 'lunch'
-});
+		host     : 'localhost',
+		user     : 'root',
+		password : '12345678',
+		database : 'lunch'
+	});
 connection.connect();
 
 function checkLogin(req, res, next) {
@@ -29,6 +29,64 @@ function checkLogin(req, res, next) {
     next();
   }
 }
+
+var regular_item = function(data) {
+	var list = {};
+	data.map((item)=>{
+		var d = {
+			'id': item.id,
+			'name': item.name,
+			'price': item.price,
+		}
+		if (list[item.type_name]) {
+			list[item.type_name].push(d)
+		}else {
+			list[item.type_name] = [];
+			list[item.type_name].push(d)
+		}
+	})
+	return list
+}
+
+var get_menu = function(res_id){
+	return new Promise((resolve, reject)=> {
+		connection.query('select item.*, item_type.name type_name from item INNER JOIN item_type ON item.type_id=item_type.id WHERE restaurant_id = ?', res_id, function(err, results, fields) {
+			if (err) { 
+				reject(err)
+			}
+			if (results) {
+				resolve(regular_item(results))
+			}else {
+				reject(err)
+			}	
+		});
+	})
+}
+
+
+var restaurant_list = function () {
+	return new Promise((resolve, reject) => { 
+		connection.query('SELECT * FROM restaurant', function(err, results, fields) {
+			if (err) { 
+				reject(err)
+				throw err
+			}
+			if (results) {
+				resolve(results)
+			}else {
+				reject()
+			}	
+		});
+	});	
+}
+
+var item_list = function (res_id) {
+	
+}
+
+
+
+
 // var ac = {
 // 	name: 'dragon',
 // 	password: '12345678',
@@ -51,13 +109,12 @@ function checkLogin(req, res, next) {
 // // });
 // connection.end();
 
-app.get('/', checkLogin, function(req, res){
-	res.end('logined')
-})
+
+
+
 
 app.get('/login', function(req, res){
 	if (!req.session.username) {
-		console.log('username session: ' + req.session.username)
 		res.render('login', {})
 	}else {
 		res.redirect('/')
@@ -70,8 +127,6 @@ app.get('/logout', function(req, res){
 })
 
 app.post('/login', function(req, res){
-	console.log(req.body)
-	console.log('username session: ' + req.session.username)
 
 	connection.query('SELECT * FROM account WHERE name = ?', req.body.username, function(err, results, fields) {
 		if (err) { 
@@ -80,15 +135,20 @@ app.post('/login', function(req, res){
 		if (results.length !== 0) {
 			if (results[0].password == req.body.password) {
 				req.session.username = req.body.username
-				res.end('success');
+				res.redirect('/')
+				//res.end('success');
 			}else {
-				res.end('forbidden')
+				res.redirect('/login')
 			}
 		}else {
-			res.end('forbidden')
+			res.redirect('/login')
 		}	
 	});
-	connection.end();
+	// connection.end();
+})
+
+app.get('/create', checkLogin, function(req, res){
+	res.end('/create')
 })
 
 app.get('/order', (req, res) => {
@@ -101,6 +161,54 @@ app.get('/order', (req, res) => {
 		console.log(results)
 	});
 })
+
+
+
+
+
+
+
+
+app.get("/", checkLogin, function(req,res,next){
+    //抓取submit的資料 url上會有顯示    
+    res.render('index');
+    //res.send(result.toString());
+    // cookie 最大 4KB
+    //send 字串
+    
+});
+app.get("/order", checkLogin, function(req,res,next){
+    console.log(req.query.name);
+    res.render('order.pug');    
+});
+app.get("/initiate", checkLogin, function(req,res,next){
+    res.render('initiate.pug'); 
+});
+app.get("/overview", checkLogin, function(req,res,next){
+    res.render('overview.pug'); 
+});
+app.get("/new_menu", checkLogin, function(req,res,next){
+    res.render('new_menu.pug'); 
+});
+app.get("/old_menu", checkLogin, function(req,res,next){
+    res.render('old_menu.pug'); 
+});
+app.get("/choose_shop", checkLogin, function(req,res,next){
+	restaurant_list().then(function(result) {
+		res.render('choose_shop', { res: result })
+	})
+});
+app.get("/menu_details", checkLogin, function(req,res,next){
+    res.render('menu_details.pug');
+});
+
+app.get("/choose_shop/:id", function(req, res, next){
+	
+	get_menu(req.params.id).then(x=>{
+		console.log(x)
+		res.render('menu_details.pug', {menu: x, shop_name: req.query.shop});
+	})
+});
 
 
 app.listen(8888, () => {

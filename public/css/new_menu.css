@@ -1,0 +1,13 @@
+#form{
+    text-align: left;
+    display: inline-flex;
+    min-width:200px;
+    width:800px;
+    min-height:300px;
+    border: 2px solid black;
+}
+#new_item{
+    position: fixed;
+    bottom:50px;
+    right:200px;
+}

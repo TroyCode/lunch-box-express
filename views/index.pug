@@ -1,0 +1,52 @@
+head
+    link(rel='stylesheet', type='text/css', href='css/main.css')
+    script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+body
+        .top_menu
+            ul.top_menu_text
+                h5#user_name
+                h5#user_email
+            div(style='height:1px;width:100%;background-color:black;')
+            .top_iframe
+                ul(style='margin-top:10px;')
+                    button#choose_shop
+                        li 發起
+                    button#overview
+                        li 總覽
+        .main_body(name='main_body')
+            include overview.pug
+
+        .bottom_menu
+            h5 熱門店家
+        script.
+           $("#choose_shop").click(function(){
+               $.ajax({
+                   url:'/choose_shop',
+                   type:'GET',
+                   success:function(url){
+                       $('.main_body').html(url);
+                   }
+               });
+                return false;
+            });
+
+            $("#overview").click(function(){
+               $.ajax({
+                   url:'/overview',
+                   type:'GET',
+                   success:function(url){
+                       $('.main_body').html(url);
+                   }
+               });
+                return false;
+            });
+            $(document).ready(function() {
+                $.ajaxSetup({
+                    async: false
+                    }); 
+                    var url='json/main.json';
+                    $.getJSON(url,{},function(data){
+                        $("#user_name").text(data.user.name);
+                        $("#user_email").text(data.user.email);
+                        });
+                        });
