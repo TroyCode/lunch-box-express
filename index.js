@@ -30,13 +30,48 @@ function checkLogin(req, res, next) {
   }
 }
 
+var regular_item = function(data) {
+	var list = {};
+	data.map((item)=>{
+		var d = {
+			'id': item.id,
+			'name': item.name,
+			'price': item.price,
+		}
+		if (list[item.type_name]) {
+			list[item.type_name].push(d)
+		}else {
+			list[item.type_name] = [];
+			list[item.type_name].push(d)
+		}
+	})
+	return list
+}
+
+var get_menu = function(res_id){
+	return new Promise((resolve, reject)=> {
+		connection.query('select item.*, item_type.name type_name from item INNER JOIN item_type ON item.type_id=item_type.id WHERE restaurant_id = ?', res_id, function(err, results, fields) {
+			if (err) { 
+				reject(err)
+			}
+			if (results) {
+				resolve(regular_item(results))
+			}else {
+				reject(err)
+			}	
+		});
+	})
+}
+
+
 var restaurant_list = function () {
 	return new Promise((resolve, reject) => { 
 		connection.query('SELECT * FROM restaurant', function(err, results, fields) {
 			if (err) { 
 				reject(err)
+				throw err
 			}
-			if (results.length !== 0) {
+			if (results) {
 				resolve(results)
 			}else {
 				reject()
@@ -46,30 +81,9 @@ var restaurant_list = function () {
 }
 
 var item_list = function (res_id) {
-	connection.query('SELECT * FROM item WHERE restaurant_id = ?', res_id, function(err, results, fields) {
-		if (err) { 
-			throw err
-		}
-		if (results.length !== 0) {
-			return results
-		}else {
-			return []
-		}	
-	});
+	
 }
 
-var type_list = function (res_id) {
-	connection.query('SELECT item_type.* FROM item_type WHERE item_type.id in (SELECT item.type_id from item WHERE item.res_id = ?)', res_id, function(err, results, fields) {
-		if (err) { 
-			throw err
-		}
-		if (results.length !== 0) {
-			return results
-		}else {
-			return []
-		}	
-	});
-}
 
 
 
@@ -188,6 +202,13 @@ app.get("/menu_details", checkLogin, function(req,res,next){
     res.render('menu_details.pug');
 });
 
+app.get("/choose_shop/:id", function(req, res, next){
+	
+	get_menu(req.params.id).then(x=>{
+		console.log(x)
+		res.render('menu_details.pug', {menu: x, shop_name: req.query.shop});
+	})
+});
 
 
 app.listen(8888, () => {
