@@ -172,17 +172,6 @@ app.get('/order', (req, res) => {
 })
 
 app.get('/order/:event_id', (req, res) => {
-	// {
-	// 	event: {
-	// 		org_id: 1, 
-	// 		res_id:31, 
-	// 		end_time:2017-09-28 15:17:22
-	// 	},
-	// 	menu: {
-	// 		漢堡: [{id: 364, name: '麥香雞', price: 35}],
-	// 		飲料: [{id: 408, name: '奶茶(中)', price: 20}]
-	// 	}
-	// }
 	get_event(req.params.event_id).then(event => {
 		let event_detail = {
 			org_id: event.account_id,
