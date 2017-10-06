@@ -1,0 +1,11 @@
+head
+		link(rel='stylesheet', type='text/css', href='../css/main.css')
+		script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+body
+		each rest in res
+			div
+				a(href='/create/'+rest.id)=rest.id 
+				H1=rest.name
+				H1=rest.address
+				H1=rest.phone
+				
