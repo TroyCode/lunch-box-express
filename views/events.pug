@@ -1,12 +1,12 @@
 head
-    link(rel='stylesheet', type='text/css', href='css/main.css')
+    link(rel='stylesheet', type='text/css', href='../css/main.css')
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
 body
     a(href='order_history')
         p 我的訂單
     -let overviews=[['Sean','龍哥肉燥飯',"7:30","10:30"],['dargon','test_shop',"9:30","11:30"]]
         each val in overviews
-            a(href='order')
+            a(href='/order')
                 .body_div 
                     p 店名:  #{val[0]}
                     p 地址:#{val[1]}

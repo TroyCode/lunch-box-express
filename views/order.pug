@@ -1,5 +1,5 @@
 head
-    link(rel='stylesheet', type='text/css', href='css/main.css')
+    link(rel='stylesheet', type='text/css', href='../css/main.css')
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
 body
     p 我要訂......
@@ -12,15 +12,15 @@ body
             .body_div
                 span#kind  種類：#{val[0]}
                 //- val.kind
-        each val,i in food
-            div.food_menu
-                each k,j in food[i]
-                    if j >0
-                        span #{food[i][j]}
-                        input(type='number' min=0 max =90 style="display:inline")
-                        br.
-    a(href='order_detail')
-        p 確定
+        form#order_form(method='POST' action='order_detail') 
+            each val,i in food
+                div.food_menu
+                    each k,j in food[i]
+                        if j >0
+                            span #{food[i][j]}
+                            input(name=j type='number' value=0 min=0 max =90 style="display:inline")
+                            br.
+            input(type='submit' value='確定')
     script.
         for (let i in document.querySelectorAll(".body_div"))
             document.querySelectorAll(".body_div")[i].id = i;
@@ -32,4 +32,7 @@ body
                 $('.food_menu').hide();
                 $('#food'+this.id).show();
                 });
+            
         });
+        
+
