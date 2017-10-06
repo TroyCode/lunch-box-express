@@ -163,11 +163,11 @@ app.get('/create', checkLogin, function(req, res){
 app.get('/order', (req, res) => {
 	let sql = 'SELECT a.name organizer, r.name, e.end_time FROM event e \
 					   JOIN account a ON e.account_id = a.id \
-					   JOIN restaurant r ON e.restaurant_id = r.id;' 
+					   JOIN restaurant r ON e.restaurant_id = r.id \
+					   WHERE end_time > NOW();' 
 	connection.query(sql, (err, results) => {
 		if (err) throw err
-		res.render('order', {event_list:results})
-		console.log(results)
+		res.render('order', {event_list: results})
 	});
 })
 
