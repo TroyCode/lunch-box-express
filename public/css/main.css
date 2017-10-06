@@ -114,3 +114,13 @@ h5,input{
     border: 1px solid black;
     display: inline-block;
 }
+#events,#restaurant{
+    height: 300px;
+    width: 300px;
+    margin:50px 50px;
+}
+.food_menu{
+    min-height:1px;
+    width:100%;
+    border: 1px solid black;
+}
