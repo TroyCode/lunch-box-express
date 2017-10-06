@@ -1,0 +1,10 @@
+- if (!event_list[0]) { 
+		H1 NO EVENTS
+- }
+
+ul
+	each val in event_list
+		li= val.name
+		li= val.end_time
+		li= val.organizer
+		br

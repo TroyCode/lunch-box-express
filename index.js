@@ -172,13 +172,12 @@ app.get('/order', (req, res) => {
 
 	connection.query(sql, (err, results) => {
 		if (err) throw err
-		res.render('order', {event_list: results})
+		res.render('events', {event_list: results})
 	});
 })
 
 app.get('/order/:event_id', (req, res) => {
 	get_event(req.params.event_id).then(event => {
-		console.log(event)
 		let event_detail = {
 			org_name: event.ac_name,
 			res_name: event.res_name,
@@ -186,9 +185,14 @@ app.get('/order/:event_id', (req, res) => {
 			end_time: event.end_time
 		}
 		get_menu(event_detail.res_id).then(menu => {
-			res.render('order_detail', {event: event_detail, menu: menu})
+			console.log({event: event_detail, menu: menu})
+			res.render('order', {event: event_detail, menu: menu})
 		})
 	})
+})
+
+app.post('/order/:evnet_id', (req, res) => {
+
 })
 
 
