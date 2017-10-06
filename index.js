@@ -12,7 +12,8 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')))
 app.set('views', path.join(__dirname, 'views'))
-app.use(session({ secret: 'I_AM_5ECRE7', resave: true, saveUninitialized: false, cookie: { path: '/', httpOnly: true, maxAge: null }}))
+app.use(session({ secret: 'I_AM_5ECRE7', resave: true, saveUninitialized: false, 
+	cookie: { path: '/', httpOnly: true, maxAge: null }}))
 
 var connection = mysql.createConnection({
 		host     : 'localhost',
@@ -50,7 +51,11 @@ var regular_item = function(data) {
 
 var get_menu = function(res_id){
 	return new Promise((resolve, reject)=> {
-		connection.query('select item.*, item_type.name type_name from item INNER JOIN item_type ON item.type_id=item_type.id WHERE restaurant_id = ?', res_id, function(err, results, fields) {
+		connection.query('select item.*, item_type.name type_name \
+										  from item INNER JOIN item_type \
+										  ON item.type_id=item_type.id \
+										  WHERE restaurant_id = ?', res_id, 
+										  function(err, results, fields) {
 			if (err) { 
 				reject(err)
 			}
@@ -99,6 +104,10 @@ var get_event = event_id => {
 	})
 }
 
+// var insert_item = () {
+	
+// }
+
 
 // var ac = {
 // 	name: 'dragon',
@@ -110,7 +119,8 @@ var get_event = event_id => {
 //   console.log('rows: ', results);
 //   console.log('fields: ', fields);
 // });
-// connection.query('SELECT * FROM account WHERE id = ?', '1', function(err, results, fields) {
+// connection.query('SELECT * FROM account WHERE id = ?', '1', 
+// 	function(err, results, fields) {
 //   if (err) throw err;
 //   console.log('rows: ', results);
 //   console.log('fields: ', fields);
@@ -126,7 +136,7 @@ var get_event = event_id => {
 
 
 
-app.get('/login', function(req, res){
+app.get('/login', function(req, res) {
 	if (!req.session.username) {
 		res.render('login', {})
 	}else {
@@ -134,20 +144,22 @@ app.get('/login', function(req, res){
 	}
 })
 
-app.get('/logout', function(req, res){
+app.get('/logout', function(req, res) {
 	delete req.session.username;
   res.redirect('/login');
 })
 
-app.post('/login', function(req, res){
+app.post('/login', function(req, res) {
 
-	connection.query('SELECT * FROM account WHERE name = ?', req.body.username, function(err, results, fields) {
+	connection.query('SELECT * FROM account WHERE name = ?', 
+		req.body.username, function(err, results, fields) {
 		if (err) { 
 			throw err
 		}
 		if (results.length !== 0) {
 			if (results[0].password == req.body.password) {
 				req.session.username = req.body.username
+				req.session.myid = results[0].id
 				res.redirect('/')
 				//res.end('success');
 			}else {
@@ -160,7 +172,7 @@ app.post('/login', function(req, res){
 	// connection.end();
 })
 
-app.get('/create', checkLogin, function(req, res){
+app.get('/create', checkLogin, function(req, res) {
 	res.end('/create')
 })
 
@@ -179,6 +191,7 @@ app.get('/order', (req, res) => {
 app.get('/order/:event_id', (req, res) => {
 	get_event(req.params.event_id).then(event => {
 		let event_detail = {
+			event_id: req.params.event_id,
 			org_name: event.ac_name,
 			res_name: event.res_name,
 			res_id:   event.res_id,
@@ -192,7 +205,12 @@ app.get('/order/:event_id', (req, res) => {
 })
 
 app.post('/order/:evnet_id', (req, res) => {
-
+	for (var item_id in req.body) {
+		if (req.body.item_id != 0) {
+			console.log(req.session.myid)
+		}
+	}
+	res.end()
 })
 
 

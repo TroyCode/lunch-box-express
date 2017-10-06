@@ -1,15 +1,17 @@
 ul 
-		li= '發起人: ' + event.org_name
-		li= event.res_name
-		li= '截止時間: ' + event.end_time
+	li= '發起人: ' + event.org_name
+	li= event.res_name
+	li= '截止時間: ' + event.end_time
 
 H2 Menu
-each v, k in menu
-	ul= k
-	each item in v
-		li= item.name
-		li= item.price
-		li= item.id
+form(action='/order/' + event.event_id, method = 'POST')
+	each v, k in menu
+		ul= k
+		each item in v
+			li= item.name
+			li= item.price
+			input(name = item.id, value = 0, type = 'number')
+	input(type = 'submit')
 
 //- button#send 送出
 //- //- script(src='../js/order.js')
