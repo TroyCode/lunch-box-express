@@ -1,11 +1,16 @@
 head
-    link(rel='stylesheet', type='text/css', href='css/main.css')
-    script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+	link(rel='stylesheet', type='text/css', href='../css/main.css')
+	script(src='https://code.jquery.com/jquery-3.2.1.min.js')
 body
-    p  團購店名：
-    //-
-    p 結束時間：
-    
-    a(href='create_detail')
-        p 確認
-    
+	form(method='POST', action='/create/'+shop_id)
+		input#end_date(name='end_time', type='datetime-local', style='display:inline-block;')
+		H1=shop_name
+		H2=shop_id
+		each item, key in menu
+			each it in item
+				div
+					H1=it.id
+					H1=it.name
+					H1=it.price
+					H1=it.res_name
+		input(type='submit')
