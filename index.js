@@ -180,6 +180,7 @@ app.get('/order/:event_id', (req, res) => {
 		}
 		get_menu(event_detail.res_id).then(menu => {
 			console.log({event: event_detail, menu: menu})
+			console.log(menu)
 			res.render('order_detail', {event: event_detail, menu: menu})
 		})
 	})

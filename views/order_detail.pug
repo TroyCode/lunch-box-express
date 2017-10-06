@@ -1,3 +1,15 @@
+ul 
+		li= '發起人: ' + event.org_id
+		li= event.res_id
+		li= '截止時間: ' + event.end_time
+
+H2 Menu
+each v, k in menu
+	ul= k
+	each item in v
+		li= item.name
+		li= item.price
+
 //- button#send 送出
 //- //- script(src='../js/order.js')
 //- -var shop_list=['rice','noddle']
