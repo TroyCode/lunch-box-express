@@ -85,10 +85,14 @@ var item_list = function (res_id) {
 }
 
 var get_event = event_id => {
-	let sql = 'SELECT * FROM event \
-						 WHERE id = ' + event_id + ';'
+	let sql = 'SELECT ac.name ac_name, r.name res_name, r.id res_id, e.end_time \
+	           FROM event e \
+ 						 JOIN restaurant r ON r.id = e.restaurant_id \
+ 						 JOIN account ac ON ac.id = e.account_id \
+ 						 WHERE e.id = ?;'
+
 	return new Promise((resolve, reject) => {
-		connection.query(sql, (err, results) => {
+		connection.query(sql, event_id, (err, results) => {
 			if (err) throw err
 			resolve(results[0])
 		})
@@ -165,6 +169,7 @@ app.get('/order', (req, res) => {
 					   JOIN account a ON e.account_id = a.id \
 					   JOIN restaurant r ON e.restaurant_id = r.id \
 					   WHERE end_time > NOW();' 
+
 	connection.query(sql, (err, results) => {
 		if (err) throw err
 		res.render('order', {event_list: results})
@@ -173,14 +178,14 @@ app.get('/order', (req, res) => {
 
 app.get('/order/:event_id', (req, res) => {
 	get_event(req.params.event_id).then(event => {
+		console.log(event)
 		let event_detail = {
-			org_id: event.account_id,
-			res_id: event.restaurant_id,
+			org_name: event.ac_name,
+			res_name: event.res_name,
+			res_id:   event.res_id,
 			end_time: event.end_time
 		}
 		get_menu(event_detail.res_id).then(menu => {
-			console.log({event: event_detail, menu: menu})
-			console.log(menu)
 			res.render('order_detail', {event: event_detail, menu: menu})
 		})
 	})
