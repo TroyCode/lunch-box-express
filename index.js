@@ -80,9 +80,9 @@ var get_rest_name = function(res_id){
 	})
 }
 
-var create_event = function(res_id, end_time, ac_id) {
+var create_event = function(res_id, start_time, end_time, ac_id) {
 	return new Promise((resolve, reject) => { 
-		connection.query('insert into event (id, restaurant_id, start_time, end_time, account_id) VALUES(null, ?, now(), ?, ?)', [res_id, end_time, ac_id], function(err, results, fields) {
+		connection.query('insert into event (id, restaurant_id, start_time, end_time, account_id) VALUES(null, ?, ?, ?, ?)', [res_id, start_time, end_time, ac_id], function(err, results, fields) {
 			if (err) { 
 				reject(err)
 				throw err
@@ -204,7 +204,6 @@ app.post('/login', function(req, res){
 			res.redirect('/login')
 		}	
 	});
-	// connection.end();
 })
 
 app.get('/create', checkLogin, function(req, res){
@@ -236,10 +235,16 @@ app.post("/create/:id", function(req, res, next){
 	console.log(end_time)
 	console.log(res_id)
 	console.log(ac_id)
-	// create_event(res_id, end_time, ac_id).then(x=>{
-	// 	console.log(x)
-	// })
-	res.end('123')
+	if (end_time) {
+		var d = new Date(end_time);
+		create_event(res_id, Math.round(new Date()/1000), d.getTime()/1000, ac_id).then(x=>{
+			console.log('x')
+			console.log(x)
+		})
+	}else {
+		res.end('error')
+	}
+	res.end('create_detail', {ac_id: ac_id, res_id: res_id, end_time: end_time})
 });
 
 app.get('/order', (req, res) => {
@@ -254,17 +259,6 @@ app.get('/order', (req, res) => {
 })
 
 app.get('/order/:event_id', (req, res) => {
-	// {
-	// 	event: {
-	// 		org_id: 1, 
-	// 		res_id:31, 
-	// 		end_time:2017-09-28 15:17:22
-	// 	},
-	// 	menu: {
-	// 		漢堡: [{id: 364, name: '麥香雞', price: 35}],
-	// 		飲料: [{id: 408, name: '奶茶(中)', price: 20}]
-	// 	}
-	// }
 	get_event(req.params.event_id).then(event => {
 		let event_detail = {
 			org_id: event.account_id,
@@ -285,12 +279,7 @@ app.get('/order/:event_id', (req, res) => {
 
 
 app.get("/", checkLogin, function(req,res,next){
-    //抓取submit的資料 url上會有顯示    
     res.render('index');
-    //res.send(result.toString());
-    // cookie 最大 4KB
-    //send 字串
-    
 });
 app.get("/order", checkLogin, function(req,res,next){
     console.log(req.query.name);

@@ -2,3 +2,4 @@
 node_modules/
 views/test.pug
 config.sh
+config
