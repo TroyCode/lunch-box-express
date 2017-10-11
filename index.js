@@ -104,10 +104,36 @@ var get_event = event_id => {
 	})
 }
 
-// var insert_item = () {
-	
-// }
+var insert_order = (event_id, user_id) => {
+	let sql = 'INSERT INTO `order` (event_id, timestamp, account_id) \
+						 VALUES (?, NOW(), ?);'
 
+	return new Promise((resolve, reject) => {
+		connection.query(sql, [event_id, user_id], (err, results) => {
+			if (err) throw err
+			resolve(results.insertId)
+		})
+	})
+}
+
+var insert_order_item = (order_id, order_set) => {
+	let sql = 'INSERT INTO `order_item` \
+						 VALUES '
+	for (var item_id in order_set) {
+		console.log(order_set[item_id])
+		if (order_set[item_id] > 0) { 
+			sql += `(${order_id}, ${item_id}, ${order_set[item_id]}), `
+		}
+	}
+	sql = sql.slice(0, -2) + ';'
+	console.log(sql)
+
+	return new Promise((resolve, reject) => {
+		connection.query(sql, (err, results) => {
+			if (err) throw err
+		})
+	})
+}
 
 // var ac = {
 // 	name: 'dragon',
@@ -198,19 +224,17 @@ app.get('/order/:event_id', (req, res) => {
 			end_time: event.end_time
 		}
 		get_menu(event_detail.res_id).then(menu => {
-			console.log({event: event_detail, menu: menu})
 			res.render('order', {event: event_detail, menu: menu})
 		})
 	})
 })
 
-app.post('/order/:evnet_id', (req, res) => {
-	for (var item_id in req.body) {
-		if (req.body.item_id != 0) {
-			console.log(req.session.myid)
-		}
-	}
-	res.end()
+app.post('/order/:event_id', (req, res) => {
+	insert_order(req.params.event_id, req.session.myid).then(order_id => {
+		insert_order_item(order_id, req.body).then(
+			res.redirect(`/order/${req.params.event_id}/${order_id}`)
+		)
+	})
 })
 
 
