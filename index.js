@@ -120,13 +120,11 @@ var insert_order_item = (order_id, order_set) => {
 	let sql = 'INSERT INTO `order_item` \
 						 VALUES '
 	for (var item_id in order_set) {
-		console.log(order_set[item_id])
 		if (order_set[item_id] > 0) { 
 			sql += `(${order_id}, ${item_id}, ${order_set[item_id]}), `
 		}
 	}
 	sql = sql.slice(0, -2) + ';'
-	console.log(sql)
 
 	return new Promise((resolve, reject) => {
 		connection.query(sql, (err, results) => {
