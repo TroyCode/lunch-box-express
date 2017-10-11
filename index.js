@@ -210,6 +210,7 @@ app.post('/login', function(req, res){
 app.get('/create', checkLogin, function(req, res){
 	restaurant_list().then(function(result) {
 		res.render('restaurant', { res: result })
+		
 	})
 })
 
@@ -223,6 +224,7 @@ app.get("/create/:id", function(req, res, next){
 				var shop_name = ''
 			}
 			console.log(menu)
+			console.log(req.params.id);
 			res.render('create', {menu: menu, shop_name: shop_name, shop_id: req.params.id});
 		})
 	})
@@ -248,7 +250,7 @@ app.get('/order', (req, res) => {
 					   JOIN restaurant r ON e.restaurant_id = r.id;' 
 	connection.query(sql, (err, results) => {
 		if (err) throw err
-		res.render('order', {event_list:results})
+		res.render('events', {event_list:results})
 		console.log(results)
 	});
 })

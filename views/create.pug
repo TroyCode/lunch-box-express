@@ -3,26 +3,19 @@ head
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
 body
     -let create_list=[];
-    p  團購店名：
-    //-
     p 結束時間：
         input(type='datetime-local' style='display:inline')
-    -let order=['麥當勞']
-    -let food=[['主餐','炸雞','漢堡'],['副餐','薯條','沙拉'],['飲料','紅茶','奶茶','垃圾飲料']]
-        each val,i in order
-                p 店名：#{val} 
+        p 店名：#{shop_name} 
                 //- val.shop_name
-        each val in food
+        each val,key in menu
             .body_div
-                span#kind  種類：#{val[0]}
-                //- val.kind
+                span#kind  種類：#{key}
         form#order_form(method='POST' action='order_detail') 
-            each val,i in food
+            each val in menu
                 div.food_menu
-                    each k,j in food[i]
-                        if j >0
-                            span #{food[i][j]}
-                            p 價格：
+                    each k in val
+                            span #{k.name}
+                            p 價格：#{k.price} $
                             br.
             input(type='submit' value='確定')
     script.
