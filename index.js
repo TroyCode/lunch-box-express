@@ -214,7 +214,8 @@ app.get('/order', (req, res) => {
 	});
 })
 
-app.get('/order/:event_id', (req, res) => {
+app.route('/order/:event_id')
+.get((req, res) => {
 	get_event(req.params.event_id).then(event => {
 		let event_detail = {
 			event_id: req.params.event_id,
@@ -228,16 +229,13 @@ app.get('/order/:event_id', (req, res) => {
 		})
 	})
 })
-
-app.post('/order/:event_id', (req, res) => {
+.post((req, res) => {
 	insert_order(req.params.event_id, req.session.myid).then(order_id => {
 		insert_order_item(order_id, req.body).then(
 			res.redirect(`/order/${req.params.event_id}/${order_id}`)
 		)
 	})
 })
-
-
 
 
 
