@@ -7,17 +7,8 @@ body
     p 可選的團購
     
     each rest in res
-        a(href='/create/'+rest.id)
+        a(href='/create/'+rest.id) 
             .body_div
                 p=rest.name
                 p=rest.address
                 p=rest.phone
-    //- script.
-    //-     for (let i in document.querySelectorAll(".body_div"))
-    //-         document.querySelectorAll(".body_div")[i].id = i;
-    //-     $(function(){
-    //-         $(".body_div").click(function(click_id){
-    //-             let c_id = this.id;
-    //-             console.log(c_id);
-    //-                     });
-    //-                     });
