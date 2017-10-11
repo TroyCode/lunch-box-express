@@ -118,10 +118,6 @@ var get_event = event_id => {
 // // });
 // connection.end();
 
-
-
-
-
 app.get('/login', function(req, res){
 	if (!req.session.username) {
 		res.render('login', {})
@@ -154,6 +150,68 @@ app.post('/login', function(req, res){
 		}	
 	});
 	// connection.end();
+})
+
+app.get('/history', checkLogin, function(req, res)
+{
+		connection.query('select book.id, restaurant.name, timestamp, total ' + 
+						 'from book, event, restaurant ' +
+						 'where event.restaurant_id = restaurant.id and ' +
+						 	'book.event_id = event.id and '+
+							'book.account_id in (select id from account where account.name = "' + req.session.username +'");',
+			function(err, results, fields) {
+				if (err) { 
+					throw err;
+				}
+				res.render('history', {list:results});
+			})
+});
+
+app.get('/history_detail/:orderID', checkLogin, function(req, res)
+{
+	connection.query('select item.name, order_item.number, item.price, order_item.number*item.price as sum '+
+					 'from order_item, item '+
+					 'where order_item.item_id = item.id and order_id="' + req.params.orderID + '";',
+		function(err, results, fields) 
+		{
+			if (err) 
+			{ 
+				throw err;
+			}
+
+		res.render('history_detail', {list:results});
+		})
+});
+
+app.get('/create_history/:eventID', checkLogin, function(req, res)
+{
+	connection.query('select item.name, sum(order_item.number) count, item.price ' +
+					 'from order_item, item ' +
+					 'where order_item.item_id = item.id and order_id in (select id from book where event_id = '+ req.params.eventID + ') ' +
+					 'group by item.name, item.price' ,
+		function(err, results, fields) 
+		{
+			if (err) 
+			{ 
+				throw err;
+			}
+
+			let sum = 0;
+			for(var i in results)
+			{
+				results[i].total = results[i].count * results[i].price;
+				sum += results[i].total;
+			}	
+
+		res.render('create_history', {list:results, sum});
+		})
+});
+
+
+
+app.get('/logout', function(req, res){
+	
+  res.redirect('/login');
 })
 
 app.get('/create', checkLogin, function(req, res){
