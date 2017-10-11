@@ -13,7 +13,8 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')))
 app.set('views', path.join(__dirname, 'views'))
-app.use(session({ secret: 'I_AM_5ECRE7', resave: true, saveUninitialized: false, cookie: { path: '/', httpOnly: true, maxAge: null }}))
+app.use(session({ secret: 'I_AM_5ECRE7', resave: true, saveUninitialized: false, 
+	cookie: { path: '/', httpOnly: true, maxAge: null }}))
 
 var connection = mysql.createConnection({
 		host     : process.env.db_host,
@@ -52,7 +53,11 @@ var regular_item = function(data) {
 
 var get_menu = function(res_id){
 	return new Promise((resolve, reject)=> {
-		connection.query('select item.*, item_type.name type_name from item INNER JOIN item_type ON item.type_id=item_type.id WHERE restaurant_id = ?', res_id, function(err, results, fields) {
+		connection.query('select item.*, item_type.name type_name \
+										  from item INNER JOIN item_type \
+										  ON item.type_id=item_type.id \
+										  WHERE restaurant_id = ?', res_id, 
+										  function(err, results, fields) {
 			if (err) { 
 				reject(err)
 			}
@@ -135,16 +140,48 @@ var item_list = function (res_id) {
 }
 
 var get_event = event_id => {
-	let sql = 'SELECT * FROM event \
-						 WHERE id = ' + event_id + ';'
+	let sql = 'SELECT ac.name ac_name, r.name res_name, r.id res_id, e.end_time \
+	           FROM event e \
+ 						 JOIN restaurant r ON r.id = e.restaurant_id \
+ 						 JOIN account ac ON ac.id = e.account_id \
+ 						 WHERE e.id = ?;'
+
 	return new Promise((resolve, reject) => {
-		connection.query(sql, (err, results) => {
+		connection.query(sql, event_id, (err, results) => {
 			if (err) throw err
 			resolve(results[0])
 		})
 	})
 }
 
+var insert_order = (event_id, user_id) => {
+	let sql = 'INSERT INTO `order` (event_id, timestamp, account_id) \
+						 VALUES (?, NOW(), ?);'
+
+	return new Promise((resolve, reject) => {
+		connection.query(sql, [event_id, user_id], (err, results) => {
+			if (err) throw err
+			resolve(results.insertId)
+		})
+	})
+}
+
+var insert_order_item = (order_id, order_set) => {
+	let sql = 'INSERT INTO `order_item` \
+						 VALUES '
+	for (var item_id in order_set) {
+		if (order_set[item_id] > 0) { 
+			sql += `(${order_id}, ${item_id}, ${order_set[item_id]}), `
+		}
+	}
+	sql = sql.slice(0, -2) + ';'
+
+	return new Promise((resolve, reject) => {
+		connection.query(sql, (err, results) => {
+			if (err) throw err
+		})
+	})
+}
 
 // var ac = {
 // 	name: 'dragon',
@@ -156,7 +193,8 @@ var get_event = event_id => {
 //   console.log('rows: ', results);
 //   console.log('fields: ', fields);
 // });
-// connection.query('SELECT * FROM account WHERE id = ?', '1', function(err, results, fields) {
+// connection.query('SELECT * FROM account WHERE id = ?', '1', 
+// 	function(err, results, fields) {
 //   if (err) throw err;
 //   console.log('rows: ', results);
 //   console.log('fields: ', fields);
@@ -168,7 +206,11 @@ var get_event = event_id => {
 // // });
 // connection.end();
 
-app.get('/login', function(req, res){
+
+
+
+
+app.get('/login', function(req, res) {
 	if (!req.session.username) {
 		res.render('login', {})
 	}else {
@@ -176,14 +218,15 @@ app.get('/login', function(req, res){
 	}
 })
 
-app.get('/logout', function(req, res){
+app.get('/logout', function(req, res) {
 	delete req.session.username;
   res.redirect('/login');
 })
 
-app.post('/login', function(req, res){
+app.post('/login', function(req, res) {
 
-	connection.query('SELECT * FROM account WHERE name = ?', req.body.username, function(err, results, fields) {
+	connection.query('SELECT * FROM account WHERE name = ?', 
+		req.body.username, function(err, results, fields) {
 		if (err) { 
 			throw err
 		}
@@ -310,29 +353,37 @@ app.post("/create/:id", function(req, res, next){
 app.get('/order', (req, res) => {
 	let sql = 'SELECT a.name organizer, r.name, e.end_time FROM event e \
 					   JOIN account a ON e.account_id = a.id \
-					   JOIN restaurant r ON e.restaurant_id = r.id;' 
+					   JOIN restaurant r ON e.restaurant_id = r.id \
+					   WHERE end_time > NOW();' 
+
 	connection.query(sql, (err, results) => {
 		if (err) throw err
-		res.render('events', {event_list:results})
-		console.log(results)
+		res.render('events', {event_list: results})
 	});
 })
 
-app.get('/order/:event_id', (req, res) => {
+app.route('/order/:event_id')
+.get((req, res) => {
 	get_event(req.params.event_id).then(event => {
 		let event_detail = {
-			org_id: event.account_id,
-			res_id: event.restaurant_id,
+			event_id: req.params.event_id,
+			org_name: event.ac_name,
+			res_name: event.res_name,
+			res_id:   event.res_id,
 			end_time: event.end_time
 		}
 		get_menu(event_detail.res_id).then(menu => {
-			console.log({event: event_detail, menu: menu})
-			res.render('order_detail', {event: event_detail, menu: menu})
+			res.render('order', {event: event_detail, menu: menu})
 		})
 	})
 })
-
-
+.post((req, res) => {
+	insert_order(req.params.event_id, req.session.myid).then(order_id => {
+		insert_order_item(order_id, req.body).then(
+			res.redirect(`/order/${req.params.event_id}/${order_id}`)
+		)
+	})
+})
 
 
 
