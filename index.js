@@ -9,18 +9,20 @@ app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
 })); 
+
 app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')))
 app.set('views', path.join(__dirname, 'views'))
 app.use(session({ secret: 'I_AM_5ECRE7', resave: true, saveUninitialized: false, cookie: { path: '/', httpOnly: true, maxAge: null }}))
 
 var connection = mysql.createConnection({
-		host     : 'localhost',
-		user     : 'root',
-		password : '12345678',
-		database : 'lunch'
+		host     : process.env.db_host,
+		user     : process.env.db_user,
+		password : process.env.db_password,
+		database : process.env.db_name
 	});
 connection.connect();
+
 
 function checkLogin(req, res, next) {
   if (!req.session.username) {
@@ -36,7 +38,7 @@ var regular_item = function(data) {
 		var d = {
 			'id': item.id,
 			'name': item.name,
-			'price': item.price,
+			'price': item.price
 		}
 		if (list[item.type_name]) {
 			list[item.type_name].push(d)
@@ -63,10 +65,58 @@ var get_menu = function(res_id){
 	})
 }
 
+var get_rest_name = function(res_id){
+	return new Promise((resolve, reject)=> {
+		connection.query('select restaurant.name from restaurant WHERE id = ?', res_id, function(err, results, fields) {
+			if (err) { 
+				reject(err)
+			}
+			if (results) {
+				resolve(results)
+			}else {
+				reject(err)
+			}	
+		});
+	})
+}
+
+var create_event = function(res_id, end_time, ac_id) {
+	return new Promise((resolve, reject) => { 
+		connection.query('insert into event (id, restaurant_id, start_time, end_time, account_id) VALUES(null, ?, now(), ?, ?)', [res_id, end_time, ac_id], function(err, results, fields) {
+			if (err) { 
+				reject(err)
+				throw err
+			}
+			if (results) {
+				resolve(results)
+			}else {
+				reject()
+			}	
+		});
+
+	});	
+}
+
 
 var restaurant_list = function () {
 	return new Promise((resolve, reject) => { 
 		connection.query('SELECT * FROM restaurant', function(err, results, fields) {
+			if (err) { 
+				reject(err)
+				throw err
+			}
+			if (results) {
+				resolve(results)
+			}else {
+				reject()
+			}	
+		});
+	});	
+}
+
+var event_list = function () {
+	return new Promise((resolve, reject) => { 
+		connection.query('select * from event WHERE start_time<=now() AND end_time>=now();', function(err, results, fields) {
 			if (err) { 
 				reject(err)
 				throw err
@@ -144,6 +194,7 @@ app.post('/login', function(req, res){
 		if (results.length !== 0) {
 			if (results[0].password == req.body.password) {
 				req.session.username = req.body.username
+				req.session.myid = results[0].id
 				res.redirect('/')
 				//res.end('success');
 			}else {
@@ -157,8 +208,39 @@ app.post('/login', function(req, res){
 })
 
 app.get('/create', checkLogin, function(req, res){
-	res.end('/create')
+	restaurant_list().then(function(result) {
+		res.render('restaurant', { res: result })
+	})
 })
+
+app.get("/create/:id", function(req, res, next){
+	console.log('get /create/:id');
+	get_menu(req.params.id).then(menu=>{
+		get_rest_name(req.params.id).then(rest=>{
+			if (rest) {
+				var shop_name = rest[0].name
+			} else {
+				var shop_name = ''
+			}
+			console.log(menu)
+			res.render('create', {menu: menu, shop_name: shop_name, shop_id: req.params.id});
+		})
+	})
+});
+
+app.post("/create/:id", function(req, res, next){
+	console.log('post /create/:id');
+	var end_time = req.body.end_time;
+	var res_id = req.params.id;
+	var ac_id = req.session.myid;
+	console.log(end_time)
+	console.log(res_id)
+	console.log(ac_id)
+	// create_event(res_id, end_time, ac_id).then(x=>{
+	// 	console.log(x)
+	// })
+	res.end('123')
+});
 
 app.get('/order', (req, res) => {
 	let sql = 'SELECT a.name organizer, r.name, e.end_time FROM event e \
@@ -218,7 +300,12 @@ app.get("/initiate", checkLogin, function(req,res,next){
     res.render('initiate.pug'); 
 });
 app.get("/overview", checkLogin, function(req,res,next){
-    res.render('overview.pug'); 
+    event_list().then(function(result) {
+		res.render('overview.pug', {ev: result}); 
+		console.log('resultttt')
+		console.log(result)
+	})
+
 });
 app.get("/new_menu", checkLogin, function(req,res,next){
     res.render('new_menu.pug'); 
@@ -235,13 +322,7 @@ app.get("/menu_details", checkLogin, function(req,res,next){
     res.render('menu_details.pug');
 });
 
-app.get("/choose_shop/:id", function(req, res, next){
-	
-	get_menu(req.params.id).then(x=>{
-		console.log(x)
-		res.render('menu_details.pug', {menu: x, shop_name: req.query.shop});
-	})
-});
+
 
 
 app.listen(8888, () => {

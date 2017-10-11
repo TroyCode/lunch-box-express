@@ -2,14 +2,21 @@ head
     link(rel='stylesheet', type='text/css', href='../css/main.css')
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
 body
-    a(href='create_history') 
+    a(href='/create_history') 
         p 我的團購
     p 可選的團購
     
-    -let shop =['麥當勞','肯基基','北新自助餐']
-    each val,i in shop
-        a(href="/create")
+    each rest in res
+        a(href='/create'+rest.id)=rest.name
             .body_div
-                p #{val}
-                //-val.shop_name
-    
+                p=rest.address
+                p=rest.phone
+    script.
+        for (let i in document.querySelectorAll(".body_div"))
+            document.querySelectorAll(".body_div")[i].id = i;
+        $(function(){
+            $(".body_div").click(function(click_id){
+                let c_id = this.id;
+                console.log(c_id);
+                        });
+                        });
