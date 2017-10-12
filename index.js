@@ -276,11 +276,33 @@ app.get('/history_detail/:orderID', checkLogin, function(req, res)
 		})
 });
 
+app.get('/create_history', checkLogin, function(req, res)
+{
+	connection.query('select event.id, restaurant.name, start_time, end_time '+
+					 'from event,restaurant where account_id in ' +
+					 '(select id from account where account.name = "' + req.session.username +'") and event.restaurant_id = restaurant.id;' ,
+		function(err, results, fields) 
+		{
+			if (err) 
+			{ 
+				throw err;
+			}
+
+			console.log(results);
+
+		res.render('create_history', {list:results});
+		})
+});
+
+
+
+
+
 app.get('/create_history/:eventID', checkLogin, function(req, res)
 {
 	connection.query('select item.name, sum(order_item.number) count, item.price ' +
 					 'from order_item, item ' +
-					 'where order_item.item_id = item.id and order_id in (select id from order where event_id = '+ req.params.eventID + ') ' +
+					 'where order_item.item_id = item.id and order_id in (select id from book where event_id = '+ req.params.eventID + ') ' +
 					 'group by item.name, item.price' ,
 		function(err, results, fields) 
 		{
@@ -296,7 +318,7 @@ app.get('/create_history/:eventID', checkLogin, function(req, res)
 				sum += results[i].total;
 			}	
 
-		res.render('create_history', {list:results, sum});
+		res.render('create_history_event', {list:results, sum});
 		})
 });
 
