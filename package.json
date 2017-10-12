@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node .",
     "start-dev": "nodemon .",
-    "set-up": "source configs"
+    "set-up": ". config"
   },
   "repository": {
     "type": "git",
