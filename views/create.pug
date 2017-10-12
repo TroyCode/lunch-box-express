@@ -2,26 +2,29 @@ head
     link(rel='stylesheet', type='text/css', href='../css/main.css')
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
     script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.js')
+    link(rel='stylesheet', href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css")
 body
     -let create_list=[];
     p 結束時間：
-        input(type='datetime-local',style='display:inline',id='end_time')
+        form#date_form(method='POST',action='',name='end_time')
+            input(type='datetime-local',style='display:inline',id='end_time')
+            button#go_create_detail 確定
+                #dialog-confirm 你確定要 #{shop_name} 嗎?
+                    p 你確定結束時間是 
+                    p#end
         p 店名：#{shop_name} 
                 //- val.shop_name
         each val,key in menu
             .body_div
                 span#kind  種類：#{key}
-        form#order_form(method='POST' action='order_detail') 
+        div
             each val in menu
                 div.food_menu
                     each k in val
                             span #{k.name}
                             p 價格：#{k.price} $
                             br.
-    button#go_create_detail 確定
-        #dialog-confirm 你確定要 #{shop_name} 嗎?
-            p 你確定結束時間是 
-                p#end
+    
             
 
     script.
@@ -47,16 +50,19 @@ body
                 }
                 $("#dialog-confirm").dialog("open"); 
                 return false; 
-
             });
             $( "#dialog-confirm" ).dialog({
                 autoOpen: false, 
                 show: "blind",
+                minHeight:200,
+                minWidth:500,
                 dialogClass: "dlg-no-close",
+                modal:true,
+                title:'您準備發起的',
                 open: function(event, ui) {
-                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        $(".ui-dialog-titlebar-close", ui.dialog).hide();
                         },
-                buttons: { 
+                buttons:{
                         "Ok": function() { $(this).dialog("close"); }, 
                         "Cancel": function() { $(this).dialog("close"); }
                         }
