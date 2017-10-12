@@ -124,7 +124,16 @@ h5,input{
     width:100%;
     border: 1px solid black;
 }
+.ui-button.ui-corner-all.ui-widget{
+    font-size: 5px;
+    text-align: center;
+    padding:0;
+    width:100px;
+}
+.ui-widget{
+    font-size: 5px;
+}
 #dialog-confirm{
-    background-color:white;
-    border: 2px solid black;
+    font-size: 10px;
+    z-index: 2;
 }

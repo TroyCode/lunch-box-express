@@ -2,6 +2,7 @@ head
     link(rel='stylesheet', type='text/css', href='../css/main.css')
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
     script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.js')
+    link(rel='stylesheet', href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css")
 body
     -let create_list=[];
     p 結束時間：
@@ -22,7 +23,6 @@ body
                             span #{k.name}
                             p 價格：#{k.price} $
                             br.
-
     script.
         for (let i in document.querySelectorAll(".body_div"))
             document.querySelectorAll(".body_div")[i].id = i;
@@ -50,21 +50,24 @@ body
             $( "#dialog-confirm" ).dialog({
                 autoOpen: false, 
                 show: "blind",
+                minHeight:200,
+                minWidth:500,
                 dialogClass: "dlg-no-close",
+                modal:true,
+                title:'您準備發起的',
                 open: function(event, ui) {
-                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
-                    },
+                    $(".ui-dialog-titlebar-close", ui.dialog).hide();
+                },
                 buttons: { 
-                        "Ok": function() { 
-                            $(this).dialog("close"); 
-                            $('#date_form').submit();
-                        }, 
-                        "Cancel": function() { 
-                            $(this).dialog("close"); 
-                        }
+                    "Ok": function() { 
+                        $(this).dialog("close"); 
+                        $('#date_form').submit();
+                    }, 
+                    "Cancel": function() { 
+                        $(this).dialog("close"); 
+                    }
                 }
             });
-
         });
         
 

@@ -315,12 +315,12 @@ app.post("/create/:id", checkLogin, function(req, res, next){
 });
 
 app.get('/order', (req, res) => {
-	let sql = 'SELECT a.name organizer, r.name, e.end_time FROM event e \
+	let sql = 'SELECT a.name organizer, r.name, e.end_time, e.id FROM event e \
 					   JOIN account a ON e.account_id = a.id \
 					   JOIN restaurant r ON e.restaurant_id = r.id \
 					   WHERE end_time > NOW();' 
-
 	connection.query(sql, (err, results) => {
+		console.log(results);
 		if (err) throw err
 		res.render('events', {event_list: results})
 	});
