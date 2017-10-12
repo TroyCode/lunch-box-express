@@ -3,8 +3,6 @@ head
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
 body
     p 我要訂......
-    -let order=['麥當勞']
-    -let food=[['主餐','炸雞','漢堡'],['副餐','薯條','沙拉'],['飲料','紅茶','奶茶','垃圾飲料']]
         each val,i in event_list
                 p 店名：#{val.name} 
                 //- val.shop_name
@@ -32,7 +30,6 @@ body
                 $('.food_menu').hide();
                 $('#food'+this.id).show();
                 });
-            
         });
         
 

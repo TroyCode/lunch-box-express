@@ -1,10 +1,11 @@
 head
     link(rel='stylesheet', type='text/css', href='../css/main.css')
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+    script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.js')
 body
     -let create_list=[];
     p 結束時間：
-        input(type='datetime-local' style='display:inline')
+        input(type='datetime-local',style='display:inline',id='end_time')
         p 店名：#{shop_name} 
                 //- val.shop_name
         each val,key in menu
@@ -17,19 +18,50 @@ body
                             span #{k.name}
                             p 價格：#{k.price} $
                             br.
-            input(type='submit' value='確定')
- 
+    button#go_create_detail 確定
+        #dialog-confirm 你確定要 #{shop_name} 嗎?
+            p 你確定結束時間是 
+                p#end
+            
+
     script.
         for (let i in document.querySelectorAll(".body_div"))
             document.querySelectorAll(".body_div")[i].id = i;
         for (let i in document.querySelectorAll(".food_menu"))
             document.querySelectorAll(".food_menu")[i].id = 'food'+i;
         $('.food_menu').hide();
+        
         $(function(){
             $(".body_div").click(function(click_id){
                 $('.food_menu').hide();
                 $('#food'+this.id).show();
                 });
+            $('#go_create_detail').click(function(){
+                let date = $('#end_time').val();
+                if(date!=''){
+                    date=date.split('T');
+                    $('#end').html(date[0]+'  '+date[1]);
+                    }
+                else{
+                    $('#end').html("還沒填完喔");
+                }
+                $("#dialog-confirm").dialog("open"); 
+                return false; 
+
+            });
+            $( "#dialog-confirm" ).dialog({
+                autoOpen: false, 
+                show: "blind",
+                dialogClass: "dlg-no-close",
+                open: function(event, ui) {
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        },
+                buttons: { 
+                        "Ok": function() { $(this).dialog("close"); }, 
+                        "Cancel": function() { $(this).dialog("close"); }
+                        }
+                    });
+
         });
         
 
