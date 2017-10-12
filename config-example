@@ -1,0 +1,4 @@
+export db_host=''
+export db_user=''
+export db_password=''
+export db_name=''
