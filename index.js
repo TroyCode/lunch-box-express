@@ -23,7 +23,6 @@ var connection = mysql.createConnection({
 	});
 connection.connect();
 
-
 function checkLogin(req, res, next) {
   if (!req.session.username) {
     res.redirect('/login')
@@ -82,7 +81,7 @@ var get_rest_name = function(res_id){
 
 var create_event = function(res_id, start_time, end_time, ac_id) {
 	return new Promise((resolve, reject) => { 
-		connection.query('insert into event (id, restaurant_id, start_time, end_time, account_id) VALUES(null, ?, ?, ?, ?)', [res_id, start_time, end_time, ac_id], function(err, results, fields) {
+		connection.query('insert into event (id, restaurant_id, start_time, end_time, account_id, is_active) VALUES(null, ?, ?, ?, ?, true)', [res_id, start_time, end_time, ac_id], function(err, results, fields) {
 			if (err) { 
 				reject(err)
 				throw err
@@ -212,7 +211,7 @@ app.get('/create', checkLogin, function(req, res){
 	})
 })
 
-app.get("/create/:id", function(req, res, next){
+app.get("/create/:id", checkLogin, function(req, res, next){
 	console.log('get /create/:id');
 	get_menu(req.params.id).then(menu=>{
 		get_rest_name(req.params.id).then(rest=>{
@@ -227,7 +226,7 @@ app.get("/create/:id", function(req, res, next){
 	})
 });
 
-app.post("/create/:id", function(req, res, next){
+app.post("/create/:id", checkLogin, function(req, res, next){
 	console.log('post /create/:id');
 	var end_time = req.body.end_time;
 	var res_id = req.params.id;
@@ -237,14 +236,14 @@ app.post("/create/:id", function(req, res, next){
 	console.log(ac_id)
 	if (end_time) {
 		var d = new Date(end_time);
-		create_event(res_id, Math.round(new Date()/1000), d.getTime()/1000, ac_id).then(x=>{
+		create_event(res_id, Math.round(new Date()/1000), d.getTime()/1000, ac_id).then(result=>{
 			console.log('x')
-			console.log(x)
+			console.log(result.insertId)
+			res.render('create_detail', {ac_id: ac_id, res_id: res_id, end_time: end_time, insert_id: result.insertId})
 		})
 	}else {
 		res.end('error')
 	}
-	res.end('create_detail', {ac_id: ac_id, res_id: res_id, end_time: end_time})
 });
 
 app.get('/order', (req, res) => {
