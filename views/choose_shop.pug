@@ -1,0 +1,22 @@
+each e in res
+	div(class='body_div', id=e.id)
+		p=e.name 
+		p=e.address
+		p=e.phone
+script.
+	$('.body_div').click(function(e){
+	var clicknum=name;
+	var id = e.currentTarget.id
+	var shop_name = e.currentTarget.firstChild.innerHTML;
+	console.log(shop_name)
+	$.ajax({
+		url:'/choose_shop/'+id,
+		data:{shop: shop_name},
+		type:'GET',
+		success:function(url){
+			$('.main_body').html(url);
+			console.log('123')
+		}
+	});
+	return false;
+	});

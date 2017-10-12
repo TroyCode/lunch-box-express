@@ -1,0 +1,19 @@
+html
+  head
+  body
+    table(width='600px')
+      tr
+        td(width='10%') 編號
+        td(width='40%') 品名
+        td(width='15%') 數量
+        td(width='15%') 單價
+        td(width='20%') 小計
+
+      -let i = 1
+      each val in list
+        tr
+          td #{i++}
+          td #{val.name}
+          td #{val.number}
+          td $ #{val.price}
+          td $ #{val.sum}

@@ -1,0 +1,12 @@
+head
+    link(rel='stylesheet', type='text/css', href='../css/main.css')
+    script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+body
+    p 我訂過......?
+        -let creat_history_list = [['shop_name1','end_time1'],['shop_name2','end_time2']]
+    
+    each val,i in creat_history_list
+        a.body_div(href='/order/history/')
+            p 發起店家：#{val[0]}
+            p 結束時間：#{val[1]}
+            p 詳情

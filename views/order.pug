@@ -1,0 +1,35 @@
+head
+    link(rel='stylesheet', type='text/css', href='../css/main.css')
+    script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+body
+    p 我要訂......
+        each val,i in event_list
+                p 店名：#{val.name} 
+                //- val.shop_name
+        each val in event_list
+            .body_div
+                span#kind  種類：#{val[0]}
+                //- val.kind
+        form#order_form(method='POST' action='order_detail') 
+            each val,i in event_list
+                div.food_menu
+                    each k,j in food[i]
+                        if j >0
+                            span #{food[i][j]}
+                            input(name=j type='number' value=0 min=0 max =90 style="display:inline")
+                            br.
+            input(type='submit' value='確定')
+    script.
+        for (let i in document.querySelectorAll(".body_div"))
+            document.querySelectorAll(".body_div")[i].id = i;
+        for (let i in document.querySelectorAll(".food_menu"))
+            document.querySelectorAll(".food_menu")[i].id = 'food'+i;
+        $('.food_menu').hide();
+        $(function(){
+            $(".body_div").click(function(click_id){
+                $('.food_menu').hide();
+                $('#food'+this.id).show();
+                });
+        });
+        
+

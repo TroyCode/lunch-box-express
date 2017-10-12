@@ -1,0 +1,14 @@
+head
+    link(rel='stylesheet', type='text/css', href='../css/main.css')
+    script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+body
+    a(href='/create_history') 
+        p 我的團購
+    p 可選的團購
+    
+    each rest in res
+        a(href='/create/'+rest.id) 
+            .body_div
+                p=rest.name
+                p=rest.address
+                p=rest.phone
