@@ -17,19 +17,19 @@ app.use(session({ secret: 'I_AM_5ECRE7', resave: true, saveUninitialized: false,
 	cookie: { path: '/', httpOnly: true, maxAge: null }}))
 
 var connection = mysql.createConnection({
-		host     : process.env.db_host,
-		user     : process.env.db_user,
-		password : process.env.db_password,
-		database : process.env.db_name
-	});
+	host     : process.env.db_host,
+	user     : process.env.db_user,
+	password : process.env.db_password,
+	database : process.env.db_name
+});
 connection.connect();
 
-function checkLogin(req, res, next) {
-  if (!req.session.username) {
-    res.redirect('/login')
-  } else {
-    next();
-  }
+var checkLogin = function(req, res, next) {
+	if (!req.session.username) {
+		res.redirect('/login')
+	} else {
+		next();
+	}
 }
 
 var regular_item = function(data) {
@@ -140,7 +140,6 @@ var get_event = event_id => {
  						 JOIN restaurant r ON r.id = e.restaurant_id \
  						 JOIN account ac ON ac.id = e.account_id \
  						 WHERE e.id = ?;'
-
 	return new Promise((resolve, reject) => {
 		connection.query(sql, event_id, (err, results) => {
 			if (err) throw err
@@ -152,7 +151,6 @@ var get_event = event_id => {
 var insert_order = (event_id, user_id) => {
 	let sql = 'INSERT INTO `order` (event_id, timestamp, account_id) \
 						 VALUES (?, NOW(), ?);'
-
 	return new Promise((resolve, reject) => {
 		connection.query(sql, [event_id, user_id], (err, results) => {
 			if (err) throw err
@@ -170,7 +168,6 @@ var insert_order_item = (order_id, order_set) => {
 		}
 	}
 	sql = sql.slice(0, -2) + ';'
-
 	return new Promise((resolve, reject) => {
 		connection.query(sql, (err, results) => {
 			if (err) throw err
@@ -216,13 +213,13 @@ app.post('/login', function(req, res) {
 	});
 })
 
-app.get('/history', checkLogin, function(req, res)
+app.get('/order/history', checkLogin, function(req, res)
 {
 		connection.query('select `order`.id, restaurant.name, timestamp, total ' + 
 						 'from `order`, event, restaurant ' +
 						 'where event.restaurant_id = restaurant.id and ' +
 						 	'`order`.event_id = event.id and '+
-							'`order`.account_id in (select id from account where account.name = "' + req.session.username +'");',
+							'`order`.account_id in (select id from account where account.id = "' + req.session.myid +'");',
 			function(err, results, fields) {
 				if (err) { 
 					throw err;
@@ -231,11 +228,11 @@ app.get('/history', checkLogin, function(req, res)
 			})
 });
 
-app.get('/history_detail/:orderID', checkLogin, function(req, res)
+app.get('/order/history/:orderID', checkLogin, function(req, res)
 {
-	connection.query('select item.name, order_item.number, item.price, order_item.number*item.price as sum '+
-					 'from order_item, item '+
-					 'where order_item.item_id = item.id and order_id="' + req.params.orderID + '";',
+	connection.query('select `order`.account_id, item.name, order_item.number, item.price, order_item.number*item.price as sum '+
+					 'from order_item, item, `order` '+
+					 'where order_item.item_id = item.id and order_id = ? and `order`.account_id = ?;', [req.params.orderID, req.session.myid],
 		function(err, results, fields) 
 		{
 			if (err) 
@@ -246,7 +243,7 @@ app.get('/history_detail/:orderID', checkLogin, function(req, res)
 		})
 });
 
-app.get('/create_history', checkLogin, function(req, res)
+app.get('/create/history', checkLogin, function(req, res)
 {
 	connection.query('select event.id, restaurant.name, start_time, end_time '+
 					 'from event,restaurant where account_id in ' +
@@ -257,9 +254,6 @@ app.get('/create_history', checkLogin, function(req, res)
 			{ 
 				throw err;
 			}
-
-			console.log(results);
-
 		res.render('create_history', {list:results});
 		})
 });
@@ -268,39 +262,36 @@ app.get('/create_history', checkLogin, function(req, res)
 
 
 
-app.get('/create_history/:eventID', checkLogin, function(req, res)
+app.get('/create/history/:eventID', checkLogin, function(req, res)
 {
-	connection.query('select item.name, sum(order_item.number) count, item.price ' +
-					 'from order_item, item ' +
-					 'where order_item.item_id = item.id and order_id in (select id from `order` where event_id = '+ req.params.eventID + ') ' +
-					 'group by item.name, item.price' ,
-		function(err, results, fields) 
-		{
-			if (err) 
-			{ 
+	connection.query('select event.account_id, item.name, sum(order_item.number) count, item.price \
+					  from order_item, item, event \
+					  where order_item.item_id = item.id \
+					  and order_id in (select id from `order` \
+					                   where event_id = ? and \
+					                   event.account_id = ? ) \
+					  group by item.name, item.price;' , [req.params.eventID, req.session.myid], 
+		function(err, results, fields) {
+			if (err)  { 
 				throw err;
 			}
-
-			let sum = 0;
-			for(var i in results)
-			{
-				results[i].total = results[i].count * results[i].price;
-				sum += results[i].total;
-			}	
-
-		res.render('create_history_event', {list:results, sum});
+				let sum = 0;
+				for(var i in results) {
+					results[i].total = results[i].count * results[i].price;
+					sum += results[i].total;
+				}	
+				res.render('create_history_event', {list:results, sum});
+			
 		})
 });
 
 app.get('/create', checkLogin, function(req, res){
 	restaurant_list().then(function(result) {
 		res.render('restaurant', { res: result })
-		
 	})
 })
 
 app.get("/create/:id", checkLogin, function(req, res, next){
-	console.log('get /create/:id');
 	get_menu(req.params.id).then(menu=>{
 		get_rest_name(req.params.id).then(rest=>{
 			if (rest) {
@@ -308,48 +299,37 @@ app.get("/create/:id", checkLogin, function(req, res, next){
 			}else {
 				var shop_name = ''
 			}
-			console.log(menu)
-			console.log(req.params.id);
 			res.render('create', {menu: menu, shop_name: shop_name, shop_id: req.params.id});
 		})
 	})
 });
 
 app.post("/create/:id", checkLogin, function(req, res, next){
-	console.log('post /create/:id');
 	var end_time = req.body.end_time;
 	var res_id = req.params.id;
 	var ac_id = req.session.myid;
-	console.log(end_time)
-	console.log(res_id)
-	console.log(ac_id)
 	if (end_time) {
 		create_event(res_id, new Date(), end_time, ac_id).then(result=>{
-			console.log('x')
-			console.log(result.insertId)
-			res.redirect('/create_history/'+result.insertId)
-			
-			//res.render('create_detail', {ac_id: ac_id, res_id: res_id, end_time: end_time, insert_id: result.insertId})
-		})
+			res.redirect('/create_history/');
+		});
 	}else {
-		res.end('error')
+		res.end('error');
 	}
 });
 
-app.get('/order', (req, res) => {
+app.get('/order', checkLogin, (req, res) => {
 	let sql = 'SELECT a.name organizer, r.name, e.end_time, e.id FROM event e \
 					   JOIN account a ON e.account_id = a.id \
 					   JOIN restaurant r ON e.restaurant_id = r.id \
 					   WHERE end_time > NOW();' 
 	connection.query(sql, (err, results) => {
-		console.log(results);
 		if (err) throw err
 		res.render('events', {event_list: results})
 	});
 })
 
 app.route('/order/:event_id')
-.get((req, res) => {
+.get(checkLogin, (req, res) => {
 	get_event(req.params.event_id).then(event => {
 		let event_detail = {
 			event_id: req.params.event_id,
@@ -363,7 +343,7 @@ app.route('/order/:event_id')
 		})
 	})
 })
-.post((req, res) => {
+.post(checkLogin, (req, res) => {
 	insert_order(req.params.event_id, req.session.myid).then(order_id => {
 		insert_order_item(order_id, req.body).then(
 			res.redirect(`/order/${req.params.event_id}/${order_id}`)

@@ -2,7 +2,7 @@ head
     link(rel='stylesheet', type='text/css', href='../css/main.css')
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
 body
-    a(href='order_history')
+    a(href='/order/history')
         p 我的訂單
         each val in event_list
             a(href='/order/'+val.id)
