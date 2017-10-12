@@ -1,0 +1,26 @@
+html
+  head
+    style.
+      #tableContent tr:hover{background: yellow;}
+
+  body
+    table(width='800px', style='border-collapse:collapse;', id="tableTitle")
+      tr
+        td(width='5%') 序號
+        td(width='50%') 店名
+        td(width='30%') 時間
+        td(width='15%') 價格
+      
+    table(width='800px', style='border-collapse:collapse;', id="tableContent")
+      -let i = 1
+      each val in list
+        tr(id=val.id)
+          td(width='5%') #{i++}
+          td(width='50%') #{val.name}
+          td(width='30%') #{val.timestamp}
+          td(width='15%') $ #{val.total}
+
+    script.
+        document.querySelector("#tableContent").addEventListener("click", function(event){
+            location.href = "history_detail/" + event.target.parentNode.id;
+        });

@@ -5,15 +5,15 @@ body
     p 我要訂......
     -let order=['麥當勞']
     -let food=[['主餐','炸雞','漢堡'],['副餐','薯條','沙拉'],['飲料','紅茶','奶茶','垃圾飲料']]
-        each val,i in order
-                p 店名：#{val} 
+        each val,i in event_list
+                p 店名：#{val.name} 
                 //- val.shop_name
-        each val in food
+        each val in event_list
             .body_div
                 span#kind  種類：#{val[0]}
                 //- val.kind
         form#order_form(method='POST' action='order_detail') 
-            each val,i in food
+            each val,i in event_list
                 div.food_menu
                     each k,j in food[i]
                         if j >0

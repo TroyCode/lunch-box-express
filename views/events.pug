@@ -4,14 +4,12 @@ head
 body
     a(href='order_history')
         p 我的訂單
-    -let overviews=[['Sean','龍哥肉燥飯',"7:30","10:30"],['dargon','test_shop',"9:30","11:30"]]
-        each val in overviews
+        each val in event_list
             a(href='/order')
                 .body_div 
-                    p 店名:  #{val[0]}
-                    p 地址:#{val[1]}
-                    p 結束時間:#{val[3]}
-                    //-val.shop_name val.adress val.end_time
+                    p 店名:  #{val.name}
+                    p 發起人:#{val.organizer}
+                    p 結束時間:#{val.end_time}
     //- script.
     //-     for (let i in document.querySelectorAll(".body_div"))
     //-         document.querySelectorAll(".body_div")[i].id = i;
@@ -19,7 +17,6 @@ body
     //-         $(".body_div").click(function(click_id){
     //-             let c_id = this.id;
     //-             console.log(c_id);
-    //-                 var url='/order';
     //-                 $.ajax({
     //-                     url:'/order',
     //-                     type:'GET',

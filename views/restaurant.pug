@@ -7,7 +7,8 @@ body
     p 可選的團購
     
     each rest in res
-        a(href='/create/'+rest.id)=rest.name
+        a(href='/create/'+rest.id) 
             .body_div
+                p=rest.name
                 p=rest.address
                 p=rest.phone
