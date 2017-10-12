@@ -6,3 +6,6 @@ body
     p=res_id
     p=end_time
     p=insert_id
+    script.
+        var event_id="#{insert_id}";
+        window.location='/create_history/'+event_id;

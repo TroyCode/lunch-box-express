@@ -134,10 +134,6 @@ var event_list = function () {
 	});	
 }
 
-var item_list = function (res_id) {
-	
-}
-
 var get_event = event_id => {
 	let sql = 'SELECT ac.name ac_name, r.name res_name, r.id res_id, e.end_time \
 	           FROM event e \
@@ -182,32 +178,10 @@ var insert_order_item = (order_id, order_set) => {
 	})
 }
 
-// var ac = {
-// 	name: 'dragon',
-// 	password: '12345678',
-// 	email: 'dragon.chen@104.com.tw'
-// }
-// connection.query('INSERT INTO account SET ?', ac, function(err, results, fields) {
-//   if (err) throw err;
-//   console.log('rows: ', results);
-//   console.log('fields: ', fields);
-// });
-// connection.query('SELECT * FROM account WHERE id = ?', '1', 
-// 	function(err, results, fields) {
-//   if (err) throw err;
-//   console.log('rows: ', results);
-//   console.log('fields: ', fields);
-// });
-// connection.query('INSERT INTO account SET ?', ac, function(err, rows, fields) {
-//   if (err) throw err;
-//   console.log('rows: ', rows);
-//   console.log('fields: ', fields);
-// // });
-// connection.end();
 
-
-
-
+app.get("/", checkLogin, function(req,res,next){
+    res.render('index');
+});
 
 app.get('/login', function(req, res) {
 	if (!req.session.username) {
@@ -219,11 +193,10 @@ app.get('/login', function(req, res) {
 
 app.get('/logout', function(req, res) {
 	delete req.session.username;
-  res.redirect('/login');
+  	res.redirect('/login');
 })
 
 app.post('/login', function(req, res) {
-
 	connection.query('SELECT * FROM account WHERE name = ?', 
 		req.body.username, function(err, results, fields) {
 		if (err) { 
@@ -234,7 +207,6 @@ app.post('/login', function(req, res) {
 				req.session.username = req.body.username
 				req.session.myid = results[0].id
 				res.redirect('/')
-				//res.end('success');
 			}else {
 				res.redirect('/login')
 			}
@@ -246,11 +218,11 @@ app.post('/login', function(req, res) {
 
 app.get('/history', checkLogin, function(req, res)
 {
-		connection.query('select order.id, restaurant.name, timestamp, total ' + 
-						 'from order, event, restaurant ' +
+		connection.query('select `order`.id, restaurant.name, timestamp, total ' + 
+						 'from `order`, event, restaurant ' +
 						 'where event.restaurant_id = restaurant.id and ' +
-						 	'order.event_id = event.id and '+
-							'order.account_id in (select id from account where account.name = "' + req.session.username +'");',
+						 	'`order`.event_id = event.id and '+
+							'`order`.account_id in (select id from account where account.name = "' + req.session.username +'");',
 			function(err, results, fields) {
 				if (err) { 
 					throw err;
@@ -270,7 +242,6 @@ app.get('/history_detail/:orderID', checkLogin, function(req, res)
 			{ 
 				throw err;
 			}
-
 		res.render('history_detail', {list:results});
 		})
 });
@@ -279,7 +250,7 @@ app.get('/create_history/:eventID', checkLogin, function(req, res)
 {
 	connection.query('select item.name, sum(order_item.number) count, item.price ' +
 					 'from order_item, item ' +
-					 'where order_item.item_id = item.id and order_id in (select id from order where event_id = '+ req.params.eventID + ') ' +
+					 'where order_item.item_id = item.id and order_id in (select id from `order` where event_id = '+ req.params.eventID + ') ' +
 					 'group by item.name, item.price' ,
 		function(err, results, fields) 
 		{
@@ -299,13 +270,6 @@ app.get('/create_history/:eventID', checkLogin, function(req, res)
 		})
 });
 
-
-
-app.get('/logout', function(req, res){
-	
-  res.redirect('/login');
-})
-
 app.get('/create', checkLogin, function(req, res){
 	restaurant_list().then(function(result) {
 		res.render('restaurant', { res: result })
@@ -319,7 +283,7 @@ app.get("/create/:id", checkLogin, function(req, res, next){
 		get_rest_name(req.params.id).then(rest=>{
 			if (rest) {
 				var shop_name = rest[0].name
-			} else {
+			}else {
 				var shop_name = ''
 			}
 			console.log(menu)
@@ -338,11 +302,12 @@ app.post("/create/:id", checkLogin, function(req, res, next){
 	console.log(res_id)
 	console.log(ac_id)
 	if (end_time) {
-		var d = new Date(end_time);
-		create_event(res_id, Math.round(new Date()/1000), d.getTime()/1000, ac_id).then(result=>{
+		create_event(res_id, new Date(), end_time, ac_id).then(result=>{
 			console.log('x')
 			console.log(result.insertId)
-			res.render('create_detail', {ac_id: ac_id, res_id: res_id, end_time: end_time, insert_id: result.insertId})
+			res.redirect('/create_history/'+result.insertId)
+			
+			//res.render('create_detail', {ac_id: ac_id, res_id: res_id, end_time: end_time, insert_id: result.insertId})
 		})
 	}else {
 		res.end('error')
@@ -383,45 +348,6 @@ app.route('/order/:event_id')
 		)
 	})
 })
-
-
-
-
-
-app.get("/", checkLogin, function(req,res,next){
-    res.render('index');
-});
-app.get("/order", checkLogin, function(req,res,next){
-    console.log(req.query.name);
-    res.render('order.pug');    
-});
-app.get("/initiate", checkLogin, function(req,res,next){
-    res.render('initiate.pug'); 
-});
-app.get("/overview", checkLogin, function(req,res,next){
-    event_list().then(function(result) {
-		res.render('overview.pug', {ev: result}); 
-		console.log('resultttt')
-		console.log(result)
-	})
-
-});
-app.get("/new_menu", checkLogin, function(req,res,next){
-    res.render('new_menu.pug'); 
-});
-app.get("/old_menu", checkLogin, function(req,res,next){
-    res.render('old_menu.pug'); 
-});
-app.get("/choose_shop", checkLogin, function(req,res,next){
-	restaurant_list().then(function(result) {
-		res.render('choose_shop', { res: result })
-	})
-});
-app.get("/menu_details", checkLogin, function(req,res,next){
-    res.render('menu_details.pug');
-});
-
-
 
 
 app.listen(8888, () => {
