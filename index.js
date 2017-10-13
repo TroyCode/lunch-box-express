@@ -86,7 +86,7 @@ var get_rest_name = function(res_id){
 
 var create_event = function(res_id, start_time, end_time, ac_id) {
 	return new Promise((resolve, reject) => { 
-		connection.query('insert into event (id, restaurant_id, start_time, end_time, account_id) VALUES(null, ?, ?, ?, ?, true)', [res_id, start_time, end_time, ac_id], function(err, results, fields) {
+		connection.query('insert into event (id, restaurant_id, start_time, end_time, account_id) VALUES(null, ?, ?, ?, ?)', [res_id, start_time, end_time, ac_id], function(err, results, fields) {
 			if (err) { 
 				reject(err)
 				throw err
