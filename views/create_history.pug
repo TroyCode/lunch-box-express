@@ -1,26 +1,26 @@
 html
   head
+    style.
+      #tableContent tr:hover{background: yellow;}
+
   body
-    table(width='600px')
+    table(width='1200px', style='border-collapse:collapse;', id="tableTitle")
       tr
-        td(width='10%') 編號
-        td(width='40%') 品名
-        td(width='15%') 總數
-        td(width='15%') 單價
-        td(width='20%') 小計
-
-      -let i = 1;
+        td(width='5%') 序號
+        td(width='35%') 店名
+        td(width='30%') 開始時間
+        td(width='30%') 結束時間
+      
+    table(width='1200px', style='border-collapse:collapse;', id="tableContent")
+      -let i = 1
       each val in list
-        tr
-          td #{i++}
-          td #{val.name}
-          td #{val.count}
-          td $ #{val.price}
-          td $ #{val.total}
+        tr(id=val.id)
+          td(width='5%') #{i++}
+          td(width='35%') #{val.name}
+          td(width='30%') #{val.start_time}
+          td(width='30%') #{val.end_time}
 
-      tr
-        td
-        td
-        td
-        td(style="border-top:3px solid white; text-align:right") 總計：
-        td(style="border-top:3px solid red") $ #{sum}
+    script.
+        document.querySelector("#tableContent").addEventListener("click", function(event){
+            location.href = "/create/history/" + event.target.parentNode.id;
+        });

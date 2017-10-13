@@ -1,5 +1,5 @@
 .DS_Store
 node_modules/
 views/test.pug
-config.sh
 config
+npm-debug.log

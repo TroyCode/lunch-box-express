@@ -1,35 +1,69 @@
 head
     link(rel='stylesheet', type='text/css', href='../css/main.css')
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+    script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.js')
+    link(rel='stylesheet', href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css")
+
 body
     p 我要訂......
-        each val,i in event_list
-                p 店名：#{val.name} 
-                //- val.shop_name
-        each val in event_list
-            .body_div
-                span#kind  種類：#{val[0]}
-                //- val.kind
-        form#order_form(method='POST' action='order_detail') 
-            each val,i in event_list
-                div.food_menu
-                    each k,j in food[i]
-                        if j >0
-                            span #{food[i][j]}
-                            input(name=j type='number' value=0 min=0 max =90 style="display:inline")
-                            br.
-            input(type='submit' value='確定')
+    p 店名：#{event.res_name}
+    each val,key in menu
+        .body_div
+            span#kind  種類：#{key}
+    form(method='POST',action='',name='order_detail',id='order_detail')
+        each val in menu
+            div.food_menu
+                each k,l in val
+                    span#o_name #{k.name}
+                        span 價格：$#{k.price}   
+                        input(name=k.id, type='number' class="haha" value=0 min=0 max =90 ,style="display:inline")
+                        br.
+        button#go_order_detail 確定
+    div#dialog-confirm #{event.org_name} 你確定要 #{event.res_name} 的以下餐點嗎?
+        div#s 
     script.
         for (let i in document.querySelectorAll(".body_div"))
             document.querySelectorAll(".body_div")[i].id = i;
         for (let i in document.querySelectorAll(".food_menu"))
             document.querySelectorAll(".food_menu")[i].id = 'food'+i;
+        
         $('.food_menu').hide();
         $(function(){
             $(".body_div").click(function(click_id){
                 $('.food_menu').hide();
                 $('#food'+this.id).show();
                 });
+
+            $('#go_order_detail').click(function(){
+                let out = [];
+                let o_num =document.querySelectorAll(".haha");
+                let o_n =document.querySelectorAll("#o_name");
+                    for (let i in o_num){
+                        if(o_num[i].value>0){
+                            out.push(o_n[i].textContent+'數量:'+o_num[i].value+'<br>');
+                            }
+                        }
+                $('#s').html(out);
+                $("#dialog-confirm").dialog("open"); 
+                return false; 
+            });
+            $("#dialog-confirm").dialog({
+                autoOpen: false,
+                show: "blind",
+                modal: true ,
+                dialogClass: "dlg-no-close",
+                title:'您選的餐點',
+                open: function(event, ui) {
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        $('#order_detail').submit();},
+                buttons:{
+                        "OK": function() { $(this).dialog("close"); }, 
+                        "CANCEL": function() { $(this).dialog("close"); }
+                        }       
+                    });
+            $('#dialog_ok').click(function(){
+                $('#dialog-confirm').dialog("close");
+            });
         });
         
 
