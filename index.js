@@ -230,16 +230,17 @@ app.get('/order/history', checkLogin, function(req, res)
 
 app.get('/order/history/:orderID', checkLogin, function(req, res)
 {
-	connection.query('select `order`.account_id, item.name, order_item.number, item.price, order_item.number*item.price as sum '+
-					 'from order_item, item, `order` '+
-					 'where order_item.item_id = item.id and order_id = ? and `order`.account_id = ?;', [req.params.orderID, req.session.myid],
+	connection.query('SELECT it.name, oi.number, it.price, oi.number*it.price sum FROM `order` o \
+					  JOIN order_item oi ON o.id = oi.order_id \
+					  JOIN item it ON oi.item_id = it.id \
+					  WHERE o.id = ?;', req.params.orderID,
 		function(err, results, fields) 
 		{
 			if (err) 
 			{ 
 				throw err;
 			}
-		res.render('history_detail', {list:results});
+			res.render('history_detail', {list:results});
 		})
 });
 
@@ -310,7 +311,7 @@ app.post("/create/:id", checkLogin, function(req, res, next){
 	var ac_id = req.session.myid;
 	if (end_time) {
 		create_event(res_id, new Date(), end_time, ac_id).then(result=>{
-			res.redirect('/create_history/');
+			res.redirect('/create/history/');
 		});
 	}else {
 		res.end('error');
@@ -346,7 +347,7 @@ app.route('/order/:event_id')
 .post(checkLogin, (req, res) => {
 	insert_order(req.params.event_id, req.session.myid).then(order_id => {
 		insert_order_item(order_id, req.body).then(
-			res.redirect(`/order/${req.params.event_id}/${order_id}`)
+			res.redirect('/order/history')
 		)
 	})
 })

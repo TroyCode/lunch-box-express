@@ -16,7 +16,7 @@ body
                 each k,l in val
                     span#o_name #{k.name}
                         span 價格：$#{k.price}   
-                        input(name=j,type='number' class="haha" value=0 min=0 max =90 ,style="display:inline")
+                        input(name=k.id, type='number' class="haha" value=0 min=0 max =90 ,style="display:inline")
                         br.
         button#go_order_detail 確定
     div#dialog-confirm #{event.org_name} 你確定要 #{event.res_name} 的以下餐點嗎?
@@ -54,7 +54,8 @@ body
                 dialogClass: "dlg-no-close",
                 title:'您選的餐點',
                 open: function(event, ui) {
-                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();},
+                        $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
+                        $('#order_detail').submit();},
                 buttons:{
                         "OK": function() { $(this).dialog("close"); }, 
                         "CANCEL": function() { $(this).dialog("close"); }
