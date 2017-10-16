@@ -5,6 +5,7 @@ head
     link(rel='stylesheet', href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css")
 
 body
+    include overview.pug
     p 我要訂......
     p 店名：#{event.res_name}
     each val,key in menu
@@ -19,8 +20,8 @@ body
                         input(name=k.id, type='number' class="haha" value=0 min=0 max =90 ,style="display:inline")
                         br.
         button#go_order_detail 確定
-    div#dialog-confirm #{event.org_name} 你確定要 #{event.res_name} 的以下餐點嗎?
-        div#s 
+            #dialog-confirm #{event.org_name} 你確定要 #{event.res_name} 的以下餐點嗎?
+                p#s 
     script.
         for (let i in document.querySelectorAll(".body_div"))
             document.querySelectorAll(".body_div")[i].id = i;
@@ -43,15 +44,17 @@ body
                             out.push(o_n[i].textContent+'數量:'+o_num[i].value+'<br>');
                             }
                         }
-                $('#s').html(out);
+                //- $('#s').html(out);
                 $("#dialog-confirm").dialog("open"); 
                 return false; 
             });
             $("#dialog-confirm").dialog({
-                autoOpen: false,
+                autoOpen: false, 
                 show: "blind",
-                modal: true ,
+                minHeight:200,
+                minWidth:500,
                 dialogClass: "dlg-no-close",
+                modal:true,
                 title:'您選的餐點',
                 open: function(event, ui) {
                         $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
@@ -61,9 +64,9 @@ body
                         "CANCEL": function() { $(this).dialog("close"); }
                         }       
                     });
-            $('#dialog_ok').click(function(){
-                $('#dialog-confirm').dialog("close");
-            });
+            //-     $('#dialog_ok').click(function(){
+            //-         $('#dialog-confirm').dialog("close");
+            //- });
         });
         
 
