@@ -177,7 +177,10 @@ var insert_order_item = (order_id, order_set) => {
 
 
 app.get("/", checkLogin, function(req,res,next){
-    res.render('index');
+    res.render('index',{
+		username:req.session.username,
+		useremail:req.session.email
+	});
 });
 
 app.get('/login', function(req, res) {
@@ -203,6 +206,7 @@ app.post('/login', function(req, res) {
 			if (results[0].password == req.body.password) {
 				req.session.username = req.body.username
 				req.session.myid = results[0].id
+				req.session.email = results[0].email
 				res.redirect('/')
 			}else {
 				res.redirect('/login')

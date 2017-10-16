@@ -4,6 +4,7 @@ head
     script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.js')
     link(rel='stylesheet', href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css")
 body
+    include overview.pug
     -let create_list=[];
     p 結束時間：
         form#date_form(method='POST', action='')

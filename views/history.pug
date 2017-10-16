@@ -1,9 +1,11 @@
 html
   head
+    link(rel='stylesheet', type='text/css', href='../css/main.css')
     style.
       #tableContent tr:hover{background: yellow;}
 
   body
+    include overview.pug
     table(width='800px', style='border-collapse:collapse;', id="tableTitle")
       tr
         td(width='5%') 序號

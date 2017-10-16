@@ -2,6 +2,7 @@ head
     link(rel='stylesheet', type='text/css', href='../css/main.css')
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
 body
+    include overview.pug
     a(href='/order/history')
         p 我的訂單
         each val in event_list
@@ -10,5 +11,3 @@ body
                     p 店名:  #{val.name}
                     p 發起人:#{val.organizer}
                     p 結束時間:#{val.end_time}
-    
-
