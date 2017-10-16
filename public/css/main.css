@@ -29,7 +29,8 @@ button{
 }
 .top_menu_text{
     margin-right:50px;
-    margin-top:25px ;
+    margin-top:5px;
+    margin-bottom:0;
     text-align: right;
 }
 .top_iframe{

@@ -1,16 +1,16 @@
 html
   head
+    link(rel='stylesheet', type='text/css', href='../css/main.css')
     style.
       #tableContent tr:hover{background: yellow;}
-
   body
+    include overview.pug
     table(width='1200px', style='border-collapse:collapse;', id="tableTitle")
       tr
         td(width='5%') 序號
         td(width='35%') 店名
         td(width='30%') 開始時間
         td(width='30%') 結束時間
-      
     table(width='1200px', style='border-collapse:collapse;', id="tableContent")
       -let i = 1
       each val in list
