@@ -32,6 +32,31 @@ var checkLogin = function(req, res, next) {
 	}
 }
 
+var checkIdentity = function(category) {
+	return function(req, res, next) {
+		var query_table = category;
+		if (query_table !== '') {
+			connection.query('select account_id from `' + query_table + '` WHERE id = ?', req.params.id, function(err, results, fields) {
+				if (err) { 
+					throw err
+				}
+				if (results) {
+					if (results[0].account_id == req.session.myid) {
+						next();
+					}else {
+						res.end('forbidden');
+					}
+				}else {
+					res.end('forbidden');
+				}	
+			});
+		}
+	}	
+}
+var checkIdentity_event = checkIdentity('event');
+var checkIdentity_order = checkIdentity('order');
+
+
 var regular_item = function(data) {
 	var list = {};
 	data.map((item)=>{
@@ -232,12 +257,12 @@ app.get('/order/history', checkLogin, function(req, res)
 			})
 });
 
-app.get('/order/history/:orderID', checkLogin, function(req, res)
+app.get('/order/history/:id', [checkLogin, checkIdentity_order], function(req, res)
 {
 	connection.query('SELECT it.name, oi.number, it.price, oi.number*it.price sum FROM `order` o \
 					  JOIN order_item oi ON o.id = oi.order_id \
 					  JOIN item it ON oi.item_id = it.id \
-					  WHERE o.id = ?;', req.params.orderID,
+					  WHERE o.id = ?;', req.params.id,
 		function(err, results, fields) 
 		{
 			if (err) 
@@ -267,7 +292,7 @@ app.get('/create/history', checkLogin, function(req, res)
 
 
 
-app.get('/create/history/:eventID', checkLogin, function(req, res)
+app.get('/create/history/:id', checkLogin, checkIdentity_event, function(req, res)
 {
 	connection.query('select event.account_id, item.name, sum(order_item.number) count, item.price \
 					  from order_item, item, event \
@@ -275,7 +300,7 @@ app.get('/create/history/:eventID', checkLogin, function(req, res)
 					  and order_id in (select id from `order` \
 					                   where event_id = ? and \
 					                   event.account_id = ? ) \
-					  group by item.name, item.price;' , [req.params.eventID, req.session.myid], 
+					  group by item.name, item.price;' , [req.params.id, req.session.myid], 
 		function(err, results, fields) {
 			if (err)  { 
 				throw err;
