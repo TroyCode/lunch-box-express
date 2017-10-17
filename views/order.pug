@@ -16,7 +16,7 @@ body
             div.food_menu
                 each k,l in val
                     span#o_name #{k.name}
-                        span 價格：$#{k.price}   
+                        span  $#{k.price}   
                         input(name=k.id, type='number' class="haha" value=0 min=0 max =90 ,style="display:inline")
                         br.
         button#go_order_detail 確定

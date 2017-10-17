@@ -3,6 +3,7 @@ body
     span #{session.username}
     br.
     span #{session.email}
+    a(style='float:right',href='/logout') logout
     ul(style="display:inline;margin:5 10px;")
         li
             a(href='/order',style="display:inline;margin:5 10px;") 我想要訂！
