@@ -1,8 +1,8 @@
 //- extends index.pug
 body
-    span #{username}
+    span #{session.username}
     br.
-    span #{useremail}
+    span #{session.email}
     ul(style="display:inline;margin:5 10px;")
         li
             a(href='/order',style="display:inline;margin:5 10px;") 我想要訂！

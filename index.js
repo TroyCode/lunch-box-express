@@ -200,6 +200,10 @@ var insert_order_item = (order_id, order_set) => {
 	})
 }
 
+app.use(function(req, res, next){
+  res.locals.session = req.session;
+  next();
+});
 
 app.get("/", checkLogin, function(req,res,next){
     res.render('index',{
