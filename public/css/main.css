@@ -7,6 +7,12 @@ body{
     height:100%;
     position: absolute;
 }
+a:visited{
+    color:black;
+}
+a:hover{
+    color:red;
+}
 ul{
     padding:0;
 }
