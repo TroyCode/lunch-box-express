@@ -22,7 +22,7 @@ body
                 div.food_menu
                     each k in val
                             span #{k.name}
-                            p 價格：#{k.price} $
+                            p $：#{k.price}
                             br.
     script.
         for (let i in document.querySelectorAll(".body_div"))
@@ -30,7 +30,18 @@ body
         for (let i in document.querySelectorAll(".food_menu"))
             document.querySelectorAll(".food_menu")[i].id = 'food'+i;
         $('.food_menu').hide();
+
+        var d = new Date();
+        var hour = d.getHours();
+        var month = d.getMonth()+1;
+        var day = d.getDate();
+        if(hour>12 && hour<18){hour='17';}
+        else{hour='11';day++;}
+        var output = d.getFullYear() + '-' +(month<10 ? '0' : '') + month + '-' +(day<10 ? '0' : '') + day;
         
+    
+        $('#end_time').val(output+'T'+hour+':30');
+
         $(function(){
             $(".body_div").click(function(click_id){
                 $('.food_menu').hide();
