@@ -248,17 +248,19 @@ app.post('/login', function(req, res) {
 
 app.get('/order/history', checkLogin, function(req, res)
 {
-		connection.query('select `order`.id, restaurant.name, timestamp, total ' + 
-						 'from `order`, event, restaurant ' +
-						 'where event.restaurant_id = restaurant.id and ' +
-						 	'`order`.event_id = event.id and '+
-							'`order`.account_id in (select id from account where account.id = "' + req.session.myid +'");',
-			function(err, results, fields) {
-				if (err) { 
-					throw err;
-				}
-				res.render('history', {list:results});
-			})
+	connection.query(`select \`order\`.id, restaurant.name, DATE_FORMAT(FROM_UNIXTIME(timestamp),'%Y/%c/%d %H:%i:%S') timestamp
+						from \`order\`, event, restaurant
+						where event.restaurant_id = restaurant.id and
+							\`order\`.event_id = event.id and
+							\`order\`.account_id in 
+								(select id from account where account.id = "${req.session.myid}");`,
+	function(err, results, fields) {
+		if (err) { 
+			throw err;
+		}
+
+		res.render('history', {list:results});
+	})
 });
 
 app.get('/order/history/:id', [checkLogin, checkIdentity_order], function(req, res)
@@ -279,7 +281,7 @@ app.get('/order/history/:id', [checkLogin, checkIdentity_order], function(req, r
 
 app.get('/create/history', checkLogin, function(req, res)
 {
-	connection.query('select event.id, restaurant.name, start_time, end_time '+
+	connection.query('select event.id, restaurant.name, DATE_FORMAT(FROM_UNIXTIME(start_time),"%Y/%c/%d %H:%i:%S") start_time,  DATE_FORMAT(FROM_UNIXTIME(end_time),"%Y/%c/%d %H:%i:%S") end_time '+
 					 'from event,restaurant where account_id in ' +
 					 '(select id from account where account.name = "' + req.session.username +'") and event.restaurant_id = restaurant.id;' ,
 		function(err, results, fields) 
@@ -288,13 +290,10 @@ app.get('/create/history', checkLogin, function(req, res)
 			{ 
 				throw err;
 			}
+
 		res.render('create_history', {list:results});
 		})
 });
-
-
-
-
 
 app.get('/create/history/:id', checkLogin, checkIdentity_event, function(req, res)
 {
