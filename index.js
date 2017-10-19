@@ -82,7 +82,7 @@ var regular_item = function(data) {
 }
 
 function formatUnixTime(ut) {
-	let d = new Date(ut*1000 + TIME_OFFSET['zh-TW'])
+	let d = new Date(ut*1000)
 	let year   = d.getFullYear(),
 			month  = d.getMonth(),
 			date   = d.getDate()
@@ -247,12 +247,6 @@ app.get('/order/history/:id', [checkLogin, checkIdentity_order], function(req, r
 app.get('/create/history', checkLogin, function(req, res)
 {
 	db.selectHisByAccId(req.session.myid, results => {
-		// let history = [{
-		// 	id:         results[0].id,
-		// 	name:       results[0].name,
-		// 	start_time: formatUnixTime(results[0].start_time),
-		// 	end_time:   formatUnixTime(results[0].end_time)
-		// }]
 		results = results.map(result => {
 			result.start_time = formatUnixTime(result.start_time)
 			result.end_time = formatUnixTime(result.end_time)
@@ -262,8 +256,7 @@ app.get('/create/history', checkLogin, function(req, res)
 	})
 })
 
-app.get('/create/history/:id', checkLogin, checkIdentity_event, function(req, res)
-{
+app.get('/create/history/:id', checkLogin, checkIdentity_event, function(req, res) {
 	connection.query('select event.account_id, item.name, sum(order_item.number) count, item.price \
 					  from order_item, item, event \
 					  where order_item.item_id = item.id \
@@ -319,14 +312,13 @@ app.post("/create/:id", checkLogin, function(req, res, next){
 })
 
 app.get('/order', checkLogin, (req, res) => {
-	let sql = 'SELECT a.name organizer, r.name, e.end_time, e.id FROM event e \
-					   JOIN account a ON e.account_id = a.id \
-					   JOIN restaurant r ON e.restaurant_id = r.id \
-					   WHERE end_time > NOW();' 
-	connection.query(sql, (err, results) => {
-		if (err) throw err
+	db.selectActiveEvents((new Date()).getTime()/1000, results => {
+		results = results.map(result => {
+			result.end_time = formatUnixTime(result.end_time)
+			return result
+		})
 		res.render('events', {event_list: results})
-	});
+	})
 })
 
 app.route('/order/:event_id')

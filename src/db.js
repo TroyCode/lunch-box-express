@@ -56,6 +56,14 @@ function createEvent(params, callback) {
 	query(sql, params, callback)
 }
 
+function selectActiveEvents(params, callback) {
+	let sql = 'SELECT a.name organizer, r.name, e.end_time, e.id FROM event e \
+					   JOIN account a ON e.account_id = a.id \
+					   JOIN restaurant r ON e.restaurant_id = r.id \
+					   WHERE end_time > ?;' 
+	query(sql, params, callback)
+}
+
 module.exports = {
 	start,
 	end,
@@ -63,5 +71,6 @@ module.exports = {
 	selectMenuByResId,
 	selectResNameByResId,
 	selectHisByAccId,
+	selectActiveEvents,
 	createEvent
 }
