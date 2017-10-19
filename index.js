@@ -3,6 +3,7 @@ var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser')
 var session = require('express-session')
+var db = require('./src/db')
 
 var app = express()
 app.use(bodyParser.json());       // to support JSON-encoded bodies
@@ -22,7 +23,12 @@ var connection = mysql.createConnection({
 	password : process.env.db_password,
 	database : process.env.db_name
 });
-connection.connect();
+connection.connect()
+db.start()
+
+const TIME_OFFSET = {
+	'zh-TW': 28800
+}
 
 var checkLogin = function(req, res, next) {
 	if (!req.session.username) {
@@ -75,38 +81,14 @@ var regular_item = function(data) {
 	return list
 }
 
-var get_menu = function(res_id){
-	return new Promise((resolve, reject)=> {
-		connection.query('select item.*, item_type.name type_name \
-										  from item INNER JOIN item_type \
-										  ON item.type_id=item_type.id \
-										  WHERE restaurant_id = ?', res_id, 
-										  function(err, results, fields) {
-			if (err) { 
-				reject(err)
-			}
-			if (results) {
-				resolve(regular_item(results))
-			}else {
-				reject(err)
-			}	
-		});
-	})
-}
-
-var get_rest_name = function(res_id){
-	return new Promise((resolve, reject)=> {
-		connection.query('select restaurant.name from restaurant WHERE id = ?', res_id, function(err, results, fields) {
-			if (err) { 
-				reject(err)
-			}
-			if (results) {
-				resolve(results)
-			}else {
-				reject(err)
-			}	
-		});
-	})
+function formatUnixTime(ut) {
+	let d = new Date(ut*1000)
+	let year   = d.getFullYear(),
+			month  = d.getMonth(),
+			date   = d.getDate()
+			hour   = d.getHours()
+			minute = d.getMinutes()
+	return `${year}-${month}-${date} ${hour}:${minute}`
 }
 
 var create_event = function(res_id, start_time, end_time, ac_id) {
@@ -123,23 +105,6 @@ var create_event = function(res_id, start_time, end_time, ac_id) {
 			}	
 		});
 
-	});	
-}
-
-
-var restaurant_list = function () {
-	return new Promise((resolve, reject) => { 
-		connection.query('SELECT * FROM restaurant', function(err, results, fields) {
-			if (err) { 
-				reject(err)
-				throw err
-			}
-			if (results) {
-				resolve(results)
-			}else {
-				reject()
-			}	
-		});
 	});	
 }
 
@@ -281,22 +246,17 @@ app.get('/order/history/:id', [checkLogin, checkIdentity_order], function(req, r
 
 app.get('/create/history', checkLogin, function(req, res)
 {
-	connection.query('select event.id, restaurant.name, DATE_FORMAT(FROM_UNIXTIME(start_time),"%Y/%c/%d %H:%i:%S") start_time,  DATE_FORMAT(FROM_UNIXTIME(end_time),"%Y/%c/%d %H:%i:%S") end_time '+
-					 'from event,restaurant where account_id in ' +
-					 '(select id from account where account.name = "' + req.session.username +'") and event.restaurant_id = restaurant.id;' ,
-		function(err, results, fields) 
-		{
-			if (err) 
-			{ 
-				throw err;
-			}
-
-		res.render('create_history', {list:results});
+	db.selectHisByAccId(req.session.myid, results => {
+		results = results.map(result => {
+			result.start_time = formatUnixTime(result.start_time)
+			result.end_time = formatUnixTime(result.end_time)
+			return result
 		})
-});
+		res.render('create_history', {list: results})
+	})
+})
 
-app.get('/create/history/:id', checkLogin, checkIdentity_event, function(req, res)
-{
+app.get('/create/history/:id', checkLogin, checkIdentity_event, function(req, res) {
 	connection.query('select event.account_id, item.name, sum(order_item.number) count, item.price \
 					  from order_item, item, event \
 					  where order_item.item_id = item.id \
@@ -318,47 +278,47 @@ app.get('/create/history/:id', checkLogin, checkIdentity_event, function(req, re
 		})
 });
 
-app.get('/create', checkLogin, function(req, res){
-	restaurant_list().then(function(result) {
-		res.render('restaurant', { res: result })
+app.get('/create', checkLogin, function(req, res) {
+	db.selectAllFromRes(null, result => {
+		res.render('restaurant', {res: result})
 	})
 })
 
 app.get("/create/:id", checkLogin, function(req, res, next){
-	get_menu(req.params.id).then(menu=>{
-		get_rest_name(req.params.id).then(rest=>{
-			if (rest) {
-				var shop_name = rest[0].name
-			}else {
+	db.selectMenuByResId(req.params.id, result => {
+		menu = regular_item(result)
+		db.selectResNameByResId(req.params.id, resName => {
+			if (resName) {
+				var shop_name = resName[0].name
+			} else {
 				var shop_name = ''
 			}
 			res.render('create', {menu: menu, shop_name: shop_name, shop_id: req.params.id});
 		})
 	})
-});
+})
 
 app.post("/create/:id", checkLogin, function(req, res, next){
-	var end_time = req.body.end_time;
-	var res_id = req.params.id;
-	var ac_id = req.session.myid;
+	var end_time = new Date(req.body.end_time).getTime()/1000
+	var res_id = req.params.id
+	var ac_id = req.session.myid
 	if (end_time) {
-		create_event(res_id, new Date(), end_time, ac_id).then(result=>{
-			res.redirect('/create/history/');
-		});
-	}else {
-		res.end('error');
+		db.createEvent([res_id, new Date().getTime()/1000, end_time, ac_id], _ => {
+			res.redirect('/create/history/')
+		})
+	} else {
+		res.end('error')
 	}
-});
+})
 
 app.get('/order', checkLogin, (req, res) => {
-	let sql = 'SELECT a.name organizer, r.name, e.end_time, e.id FROM event e \
-					   JOIN account a ON e.account_id = a.id \
-					   JOIN restaurant r ON e.restaurant_id = r.id \
-					   WHERE end_time > NOW();' 
-	connection.query(sql, (err, results) => {
-		if (err) throw err
+	db.selectActiveEvents((new Date()).getTime()/1000, results => {
+		results = results.map(result => {
+			result.end_time = formatUnixTime(result.end_time)
+			return result
+		})
 		res.render('events', {event_list: results})
-	});
+	})
 })
 
 app.route('/order/:event_id')
