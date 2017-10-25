@@ -8,7 +8,7 @@ var app = express()
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
-})); 
+}))
 
 app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')))
@@ -64,7 +64,7 @@ function orderFilter(req, res, next) {
 
 var regular_item = function(data) {
 	var list = {};
-	data.map((item)=>{
+	data.map((item) => {
 		var d = {
 			'id': item.id,
 			'name': item.name,
@@ -72,7 +72,7 @@ var regular_item = function(data) {
 		}
 		if (list[item.type_name]) {
 			list[item.type_name].push(d)
-		}else {
+		} else {
 			list[item.type_name] = [];
 			list[item.type_name].push(d)
 		}
@@ -247,3 +247,6 @@ app.route('/order/:event_id')
 app.listen(8888, () => {
 	console.log('server up on port 8888')
 })
+
+module.exports = app
+
