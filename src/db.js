@@ -15,7 +15,7 @@ function end() {
 	connection.end()
 }
 
-function query(sql, params,callback) {
+function query(sql, params, callback) {
 	connection.query(sql, params, function(err, result) {
 		if (err) {
 			throw err
@@ -24,6 +24,16 @@ function query(sql, params,callback) {
 			callback(result)
 		}
 	})
+}
+
+function selectAcctByName(params, callback) {
+	let sql = 'SELECT * FROM account WHERE name = ?'
+	query(sql, params, callback)
+}
+
+function selectAcctIdByEveOrdId(params, callback) {
+	let sql = 'SELECT account_id FROM `' + params[0] + '` WHERE id = ?'
+	query(sql, [params[1]], callback)
 }
 
 function selectAllFromRes(params, callback) {
@@ -50,9 +60,23 @@ function selectHisByAccId(params, callback) {
 	query(sql, params, callback)
 }
 
-function createEvent(params, callback) {
-	let sql = 'INSERT INTO event (restaurant_id, start_time, end_time, account_id) \
-						 VALUES (?, ?, ?, ?);'
+function selectOrdHisByAcctId(params, callback) {
+	let sql = `SELECT \`order\`.id, restaurant.name, DATE_FORMAT(FROM_UNIXTIME(timestamp),'%Y/%c/%d %H:%i:%S') timestamp
+						 FROM \`order\`, event, restaurant
+						 WHERE event.restaurant_id = restaurant.id AND
+						 \`order\`.event_id = event.id AND
+						 \`order\`.account_id IN (
+							 SELECT id FROM account 
+							 WHERE account.id = ?
+						 );`
+	query(sql, params, callback)
+}
+
+function selectOrdByOrdId(params, callback) {
+	let sql = `SELECT it.name, oi.number, it.price, oi.number*it.price sum FROM \`order\` o 
+					   JOIN order_item oi ON o.id = oi.order_id 
+					   JOIN item it ON oi.item_id = it.id 
+					   WHERE o.id = ?;`
 	query(sql, params, callback)
 }
 
@@ -64,13 +88,64 @@ function selectActiveEvents(params, callback) {
 	query(sql, params, callback)
 }
 
+function selectEventById(params, callback) {
+	let sql = 'SELECT ac.name ac_name, r.name res_name, r.id res_id, e.end_time \
+	           FROM event e \
+ 						 JOIN restaurant r ON r.id = e.restaurant_id \
+ 						 JOIN account ac ON ac.id = e.account_id \
+ 						 WHERE e.id = ?;'
+	query(sql, params, callback)
+}
+
+function selectEventDtalById(params, callback) {
+	let sql = `SELECT event.account_id, item.name, SUM(order_item.number) count, item.price \
+					   FROM order_item, item, event 
+					   WHERE ( 
+					     order_item.item_id = item.id AND 
+					     order_id IN (
+					       SELECT id FROM \`order\` 
+					       where event_id = ? AND 
+					       event.account_id = ? 
+					     ) 
+					   )
+					   GROUP BY item.name, item.price;`
+	query(sql, params, callback)		   
+} 
+
+function createEvent(params, callback) {
+	let sql = 'INSERT INTO event (restaurant_id, start_time, end_time, account_id) \
+						 VALUES (?, ?, ?, ?);'
+	query(sql, params, callback)
+}
+
+function createOrder(params, callback) {
+	let sql = 'INSERT INTO `order` (event_id, timestamp, account_id) \
+						 VALUES (?, ?, ?);'
+	query(sql, params, callback)
+}
+
+function createOrderItem(params, callback) {
+	let sql = 'INSERT INTO `order_item` (order_id, item_id, number) \
+						 VALUES (?, ?, ?);'
+	query(sql, params, callback)
+}
+
+
 module.exports = {
 	start,
 	end,
+	selectAcctByName,
+	selectAcctIdByEveOrdId,
 	selectAllFromRes,
 	selectMenuByResId,
 	selectResNameByResId,
 	selectHisByAccId,
+	selectOrdHisByAcctId,
+	selectOrdByOrdId,
 	selectActiveEvents,
-	createEvent
+	selectEventById,
+	selectEventDtalById,
+	createEvent,
+	createOrder,
+	createOrderItem
 }
