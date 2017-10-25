@@ -161,14 +161,58 @@ app.get('/create/history', checkLogin, function(req, res)
 })
 
 app.get('/create/history/:id', checkLogin, checkIdentity_event, function(req, res) {
+	let queryByItem, sumByItem = 0;
+	
 	db.selectEventDtalById([req.params.id, req.session.myid], (results) => {
-		let sum = 0
-		for (var i in results) {
-			results[i].total = results[i].count * results[i].price;
-			sum += results[i].total;
-		}	
-		res.render('create_history_event', {list:results, sum});
+		for(var i in results) 
+		{
+	    	results[i].total = results[i].count * results[i].price;
+	        sumByItem += results[i].total;
+		}   
+		queryByItem = results;	
 	})
+
+	db.selectEventDtalByUser([req.params.id] , (results) => {
+    	let userTotal = 0;
+        let nowName = results[0].user;
+        
+		for(let i in results) 
+		{
+        	userTotal += results[i].price * results[i].number;
+                
+            //處理sum
+            if(i < results.length-1)
+            {
+                if (results[i].user == results[i*1+1].user)
+                {
+	                results[i].sum = "";
+                }   
+                else
+                {
+                    results[i].sum = `$ ${userTotal}`;
+                    userTotal = 0;
+                }               
+            }
+
+            if (i == results.length -1)
+            {
+                results[i].sum = `$ ${userTotal}`;
+            }
+            //處理sum end
+                
+            //處理name    
+            if (i != 0)
+            {
+   	        	if (results[i].user == nowName)
+                	results[i].user = "";
+                else
+                    nowName = results[i].user;
+            }
+			//處理name end 
+        }
+			      
+		res.render('create_history_event', {listByItem:queryByItem, sumByItem:sumByItem, listByUser: results});
+    })
 });
 
 app.get('/create', checkLogin, function(req, res) {
