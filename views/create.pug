@@ -3,6 +3,8 @@ head
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
     script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.js')
     link(rel='stylesheet', href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css")
+    script(src='../js/create_js.js')
+
 body
     include overview.pug
     -let create_list=[];
@@ -31,55 +33,46 @@ body
             document.querySelectorAll(".food_menu")[i].id = 'food'+i;
         $('.food_menu').hide();
 
-        var d = new Date();
-        var hour = d.getHours();
-        var month = d.getMonth()+1;
-        var day = d.getDate();
-        if(hour>12 && hour<18){hour='17';}
-        else{hour='11';day++;}
-        var output = d.getFullYear() + '-' +(month<10 ? '0' : '') + month + '-' +(day<10 ? '0' : '') + day;
-        
-    
-        $('#end_time').val(output+'T'+hour+':30');
-
         $(function(){
+            $('#end_time').val(time_back());        
             $(".body_div").click(function(click_id){
                 $('.food_menu').hide();
                 $('#food'+this.id).show();
             });
-            $('#go_create_detail').click(function(){
-                let date = $('#end_time').val();
-                if(date!=''){
-                    date=date.split('T');
-                    $('#end').html(date[0]+'  '+date[1]);
-                    $("#dialog-confirm").dialog("open");
-                }
-                else{
-                    alert('請填寫正確結束時間')
-                } 
-                return false; 
+        $('#go_create_detail').click(function(){
+            let date = $('#end_time').val();
+            if(date!=''){
+                date=date.split('T');
+                $('#end').html(date[0]+'  '+date[1]);
+                $("#dialog-confirm").dialog("open");
+            }else{
+                alert('請填寫正確結束時間')
+            } 
+        return false; 
             });
-            $( "#dialog-confirm" ).dialog({
-                autoOpen: false, 
-                show: "blind",
-                minHeight:200,
-                minWidth:500,
-                dialogClass: "dlg-no-close",
-                modal:true,
-                title:'您準備發起的',
-                open: function(event, ui) {
-                    $(".ui-dialog-titlebar-close", ui.dialog).hide();
-                },
-                buttons: { 
-                    "Ok": function() { 
-                        $(this).dialog("close"); 
-                        $('#date_form').submit();
-                    }, 
-                    "Cancel": function() { 
-                        $(this).dialog("close"); 
-                    }
+        $( "#dialog-confirm" ).dialog({
+            autoOpen: false, 
+            show: "blind",
+            minHeight:200,
+            minWidth:500,
+            dialogClass: "dlg-no-close",
+            modal:true,
+            title:'您準備發起的',
+            open: function(event, ui) {
+                $(".ui-dialog-titlebar-close", ui.dialog).hide();
+            },
+            buttons: { 
+                "Ok": function() { 
+                    $(this).dialog("close"); 
+                    $('#date_form').submit();
+                }, 
+                "Cancel": function() { 
+                    $(this).dialog("close"); 
                 }
+            }
             });
         });
+
+
         
 

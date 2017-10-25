@@ -16,38 +16,55 @@ body
             div.food_menu
                 each k,l in val
                     span#o_name #{k.name}
-                        span  $#{k.price}   
-                        input(name=k.id, type='number' class="haha" value=0 min=0 max =90 ,style="display:inline")
+                        span   $
+                        span#menu_price #{k.price}   
+                        input(name=k.id, type='number' class="o_num" value=0 min=0 max =90 ,style="display:inline")
                         br.
         button#go_order_detail 確定
-            #dialog-confirm #{event.org_name} 你確定要 #{event.res_name} 的以下餐點嗎?
-                p#s 
+            #dialog-confirm #{event.org_name} 你確定要 #{event.res_name} 以下餐點嗎?
+                p#s
+    h5#what_you_order(style='position:fixed;top:50px;right:50px;min-width:250px;border: 2px solid black;display:inline-block;height:auto;margin:50 50;min-height:100px;') 
+        |您所選的餐點
+
     script.
+            //給 classname 是 body_div 加上 id 方便後面script 的隱藏
         for (let i in document.querySelectorAll(".body_div"))
             document.querySelectorAll(".body_div")[i].id = i;
+            //給 classname 是 food)menu 加上 id
         for (let i in document.querySelectorAll(".food_menu"))
             document.querySelectorAll(".food_menu")[i].id = 'food'+i;
-        
+            //初始設定 菜單皆為隱藏
         $('.food_menu').hide();
         $(function(){
+                //按下所選的菜單種類後 先將所有菜單隱藏 再顯現所按的種類菜單
             $(".body_div").click(function(click_id){
                 $('.food_menu').hide();
                 $('#food'+this.id).show();
                 });
-
+                 //按下確定後 去取得 form 表單中 名字 跟 數量
             $('#go_order_detail').click(function(){
-                let out = [];
-                let o_num =document.querySelectorAll(".haha");
+                let out = ['您所選的餐點<br>'];
+                let price = [];
+                let o_num =document.querySelectorAll(".o_num");
                 let o_n =document.querySelectorAll("#o_name");
-                    for (let i in o_num){
-                        if(o_num[i].value>0){
-                            out.push(o_n[i].textContent+'數量:'+o_num[i].value+'<br>');
-                            }
-                        }
-                //- $('#s').html(out);
+                let o_price = document.querySelectorAll("#menu_price");
+                for (let i in o_price){
+                    price.push(o_price[i].innerText);
+                }
+                price = price.map(x=>x*1);
+                let final_price=0;
+                for (let i in o_num){
+                    if(o_num[i].value>0){
+                        out.push(o_n[i].textContent+'數量:'+o_num[i].value+'</br>');
+                        final_price += o_num[i].value * price[i];
+                    }
+                }
+                out.push('小計：'+final_price);
+                $('#s').html(out);
                 $("#dialog-confirm").dialog("open"); 
                 return false; 
             });
+                //彈跳視窗
             $("#dialog-confirm").dialog({
                 autoOpen: false, 
                 show: "blind",
@@ -58,15 +75,38 @@ body
                 title:'您選的餐點',
                 open: function(event, ui) {
                         $(".ui-dialog-titlebar-close", ui.dialog | ui).hide();
-                        $('#order_detail').submit();},
+                        },
                 buttons:{
-                        "OK": function() { $(this).dialog("close"); }, 
+                        "OK": function() {
+                            $('#order_detail').submit();
+                            $(this).dialog("close");
+                             }, 
                         "CANCEL": function() { $(this).dialog("close"); }
                         }       
                     });
-            //-     $('#dialog_ok').click(function(){
-            //-         $('#dialog-confirm').dialog("close");
-            //- });
+                //當有 input 標籤的按鈕被選擇的時候
+            $('input').click(function(){
+                let out = ['您所選的餐點<br>'];
+                let price = [];
+                let o_num =document.querySelectorAll(".o_num");
+                let o_n =document.querySelectorAll("#o_name");
+                let o_price = document.querySelectorAll("#menu_price");
+                for (let i in o_price){
+                    price.push(o_price[i].innerText);
+                }
+                price = price.map(x=>x*1);
+                let final_price=0;
+                for (let i in o_num){
+                    if(o_num[i].value>0){
+                        out.push(o_n[i].textContent+'數量:'+o_num[i].value+'</br>');
+                        final_price += o_num[i].value * price[i];
+                    }
+                }
+                out.push('小計：'+final_price);
+                $('#what_you_order').html(out);
+
+            });
+                
         });
         
 
