@@ -1,0 +1,77 @@
+head
+    script(src='https://code.jquery.com/jquery-3.2.1.min.js')
+    script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.js')
+    link(rel='stylesheet', href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css")
+    link(rel='stylesheet', type='text/css', href='../css/main.css')
+body
+    include overview.pug
+    form(method='POST',action='',name='create_menu',id='create_menu')
+        sqan  店名：
+        input(type='text',style='')#shop_name
+        sqan#test 店家電話
+        input(type='text',style='')#shop_phone 
+        br
+        div(style='text-align:center;height:15px').body_div.plus_kinds 新增種類
+        div(style='text-align:center;height:15px').body_div.plus_food 新增餐點
+        br
+        div.kind_box 
+script.
+    let kinds_num = 0;
+    let list_now ='#menu';
+    $(function(){
+    $('.plus_kinds').click(function(){
+        $('.create_food_menu').hide();
+        kinds_num +=1
+        $("<span/>", {
+            "class": "kinds_num",
+            "id":kinds_num,
+            "text": "種類"+kinds_num
+        }).appendTo(".kind_box");
+        $("<input/>", {
+            "class": "body_div",
+            "id": "kinds"+kinds_num,
+            "type":"text",
+            "value": "請輸入種類名稱"
+        }).appendTo(".kind_box");
+        $("<div/>", {
+            "class": "create_food_menu",
+            "id": "menu"+kinds_num,
+            "text": "種類"+kinds_num
+        }).appendTo('body');
+        $("<br/>", {
+        }).appendTo('.kind_box');
+        list_now="#menu"+kinds_num;
+    });
+     $('.plus_food').click(function(){
+         $("<br/>", {
+        }).appendTo(list_now);
+        $("<span/>", {
+            "text": "餐點名稱:"
+        }).appendTo(list_now);
+        $("<input/>", {
+            "class": "body_div",
+            "id": "kinds"+kinds_num,
+            "type":"text",
+            "value": ""
+        }).appendTo(list_now);
+        $("<span/>", {
+            "text": "餐點價格:"
+        }).appendTo(list_now);
+        $("<input/>", {
+            "class": "body_div",
+            "id": "kinds"+kinds_num,
+            "type":"number",
+            "value": "",
+            "min":"0",
+            "max":"100000"
+        }).appendTo(list_now);
+    });
+    $('body').on("click", '.kinds_num', function () {
+        $('.create_food_menu').hide();
+        list_now = "#menu"+this.id; 
+        $("#menu"+this.id).show();
+    });
+    
+
+
+    });
