@@ -7,71 +7,78 @@ body
     include overview.pug
     form(method='POST',action='',name='create_menu',id='create_menu')
         sqan  店名：
-        input(type='text',style='')#shop_name
+        input(type='text',style='display:inline-block')#shop_name
         sqan#test 店家電話
-        input(type='text',style='')#shop_phone 
+        input(type='text',style='display:inline-block')#shop_phone
+        button#go_create_menu 確定
         br
-        div(style='text-align:center;height:15px').body_div.plus_kinds 新增種類
-        div(style='text-align:center;height:15px').body_div.plus_food 新增餐點
+        div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_kinds 新增種類
+        div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_food 新增餐點
         br
         div.kind_box 
 script.
-    let kinds_num = 0;
-    let list_now ='#menu';
-    $(function(){
+    let menu_num = []
+    let food_num = []
+    let list_now = 0 
     $('.plus_kinds').click(function(){
+        food_num[menu_num.length]=0
+        list_now = menu_num.length
+        menu_num[menu_num.length]=0
         $('.create_food_menu').hide();
-        kinds_num +=1
-        $("<span/>", {
+        $("<h1/>", {
             "class": "kinds_num",
-            "id":kinds_num,
-            "text": "種類"+kinds_num
-        }).appendTo(".kind_box");
-        $("<input/>", {
-            "class": "body_div",
-            "id": "kinds"+kinds_num,
-            "type":"text",
-            "value": "請輸入種類名稱"
-        }).appendTo(".kind_box");
+            "id":list_now,
+            "style":'width:50px;display:inline-block',
+            "text": "種類"+menu_num.length
+        }).appendTo(".kind_box")
         $("<div/>", {
             "class": "create_food_menu",
-            "id": "menu"+kinds_num,
-            "text": "種類"+kinds_num
-        }).appendTo('body');
+            "id": "menu"+list_now,
+        }).appendTo('#create_menu');
+        $("<input/>", {
+            "class": "small_box",
+            "id": 'shop_name'+list_now,
+            "type":"text",
+            "value": "請輸入種類名稱"
+        }).appendTo("#menu"+list_now);
+
+
+        console.log(food_num)
+        console.log(menu_num)
+    })
+    $('.plus_food').click(function(){
         $("<br/>", {
-        }).appendTo('.kind_box');
-        list_now="#menu"+kinds_num;
-    });
-     $('.plus_food').click(function(){
-         $("<br/>", {
-        }).appendTo(list_now);
+        }).appendTo("#menu"+list_now);
         $("<span/>", {
             "text": "餐點名稱:"
-        }).appendTo(list_now);
+        }).appendTo("#menu"+list_now);
         $("<input/>", {
             "class": "body_div",
-            "id": "kinds"+kinds_num,
+            "id": "menu"+list_now+"_food"+food_num[list_now],
             "type":"text",
             "value": ""
-        }).appendTo(list_now);
+        }).appendTo("#menu"+list_now);
         $("<span/>", {
             "text": "餐點價格:"
-        }).appendTo(list_now);
+        }).appendTo("#menu"+list_now);
         $("<input/>", {
             "class": "body_div",
-            "id": "kinds"+kinds_num,
+            "id": "menu"+list_now+"_price"+food_num[list_now],
             "type":"number",
             "value": "",
             "min":"0",
             "max":"100000"
-        }).appendTo(list_now);
-    });
+        }).appendTo("#menu"+list_now);
+        food_num[list_now]+=1
+    })
+
     $('body').on("click", '.kinds_num', function () {
         $('.create_food_menu').hide();
-        list_now = "#menu"+this.id; 
-        $("#menu"+this.id).show();
+        list_now =this.id;
+        $('#menu'+list_now).show();
     });
-    
-
-
+    $('body').on("change", '.small_box', function () {
+        $('#'+list_now).text(this.value)
+        console.log(this.value)
+        console.log(list_now)
     });

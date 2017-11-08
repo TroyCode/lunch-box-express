@@ -288,6 +288,11 @@ app.route('/order/:event_id')
 })
 
 
+app.get('/create_menu', checkLogin, (req, res) => {
+	res.render('create_menu')
+})	
+
+
 app.listen(8888, () => {
 	console.log('server up on port 8888')
 })

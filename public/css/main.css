@@ -145,7 +145,6 @@ h5,input{
     z-index: 2;
 }
 .kind_box{
-    border: 1px solid black;
     height:150px;
     overflow:scroll;
 }
@@ -158,9 +157,18 @@ h5,input{
     margin-left:5px;
     padding:5px;
     font-size: 5px;
+    min-width:50px;
 }
 .create_food_menu{
     border:1px solid black;
     width:100%;
     min-height:50px;
+}
+.small_box{
+    border:1.5px solid red ;
+    min-width:50px;
+    min-height:50px;
+    display: inline-block;
+    margin-left:50px;
+    text-align: left;
 }
