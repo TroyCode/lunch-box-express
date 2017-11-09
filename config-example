@@ -1,5 +1,4 @@
-export db_host=127.0.0.1
-export db_user=root
-export db_password=12345678
-export db_name=lunch
-export db_port=3306
+export db_host=''
+export db_user=''
+export db_password=''
+export db_name=''
