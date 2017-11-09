@@ -4,3 +4,5 @@ views/test.pug
 config
 npm-debug.log
 example_sql/
+.gitignore
+config-example
