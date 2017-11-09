@@ -25,24 +25,17 @@ script.
         list_now = menu_num.length
         menu_num[menu_num.length]=0
         $('.create_food_menu').hide();
-        $("<h1/>", {
+        $("<input/>", {
             "class": "kinds_num",
             "id":list_now,
-            "style":'width:50px;display:inline-block',
+            "style":'min-width:50px;display:inline-block',
+            "placeholder":"請輸入種類",
             "text": "種類"+menu_num.length
-        }).appendTo(".kind_box")
+        }).appendTo(".kind_box");
         $("<div/>", {
             "class": "create_food_menu",
             "id": "menu"+list_now,
         }).appendTo('#create_menu');
-        $("<input/>", {
-            "class": "small_box",
-            "id": 'shop_name'+list_now,
-            "type":"text",
-            "value": "請輸入種類名稱"
-        }).appendTo("#menu"+list_now);
-
-
         console.log(food_num)
         console.log(menu_num)
     })
@@ -53,8 +46,9 @@ script.
             "text": "餐點名稱:"
         }).appendTo("#menu"+list_now);
         $("<input/>", {
-            "class": "body_div",
+            "class": "food_name",
             "id": "menu"+list_now+"_food"+food_num[list_now],
+            'style':'display:inline-block',
             "type":"text",
             "value": ""
         }).appendTo("#menu"+list_now);
@@ -62,8 +56,9 @@ script.
             "text": "餐點價格:"
         }).appendTo("#menu"+list_now);
         $("<input/>", {
-            "class": "body_div",
+            "class": "food_price",
             "id": "menu"+list_now+"_price"+food_num[list_now],
+            'style':'display:inline-block',
             "type":"number",
             "value": "",
             "min":"0",
@@ -77,8 +72,16 @@ script.
         list_now =this.id;
         $('#menu'+list_now).show();
     });
-    $('body').on("change", '.small_box', function () {
-        $('#'+list_now).text(this.value)
-        console.log(this.value)
-        console.log(list_now)
-    });
+
+    $('#go_create_menu').click(function(){
+        let menu_name=document.querySelectorAll('.kinds_num')
+        let food_name=document.querySelectorAll('.food_name')
+        let food_price=document.querySelectorAll('.food_price')
+        for(var i=0;i<menu_name.length;i++){
+            //- console.log(menu_name[i].textContent)
+        }
+        for(var i=0;i<food_name.length;i++){
+            console.log('餐點名稱：'+food_name[i].value+'價格：'+food_price[i].value)
+        }
+        return false
+    })
