@@ -8,8 +8,10 @@ body
     form(method='POST',action='',name='create_menu',id='create_menu')
         sqan  店名：
         input(type='text',style='display:inline-block')#shop_name
-        sqan#test 店家電話
+        sqan 店家電話
         input(type='text',style='display:inline-block')#shop_phone
+        sqan 店家地址
+        input(type='text',style='display:inline-block;min-width:200px')#shop_address
         button#go_create_menu 確定
         br
         div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_kinds 新增種類
@@ -72,13 +74,31 @@ script.
         list_now =this.id;
         $('#menu'+list_now).show();
     });
+    $("form").on("change",".food_price",function () {
+        var this_price = document.getElementById(this.id);
+        console.log(check_price_num(this_price.value))
+        if(check_price_num(this_price.value)==false){
+            this_price.style.color='red';
+        }else if (check_price_num(this_price.value)==true){
+            this_price.style.color='black';
+        }
+    });
+    $("body").on("change","#shop_phone",function () {
+        var this_phone = document.getElementById(this.id);
+        if(check_phone_num(this_phone.value)==false){
+            this_phone.style.color='red';
+        }else if (check_phone_num(this_phone.value)==true){
+            this_phone.style.color='black';
+        }
+    }); 
 
     $('#go_create_menu').click(function(){
         let menu_name=document.querySelectorAll('.kinds_num')
         let food_name=document.querySelectorAll('.food_name')
         let food_price=document.querySelectorAll('.food_price')
+        
         for(var i=0;i<menu_name.length;i++){
-            //- console.log(menu_name[i].textContent)
+
         }
         for(var i=0;i<food_name.length;i++){
             console.log('餐點名稱：'+food_name[i].value+'價格：'+food_price[i].value)
