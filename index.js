@@ -109,7 +109,7 @@ app.get("/", checkLogin, function(req,res,next){
 app.get('/login', function(req, res) {
 	if (!req.session.username) {
 		res.render('login', {})
-	}else {
+	} else {
 		res.redirect('/')
 	}
 })
