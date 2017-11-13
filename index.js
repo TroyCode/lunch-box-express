@@ -8,7 +8,7 @@ var app = express()
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
   extended: true
-})); 
+}))
 
 app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')))
@@ -64,7 +64,7 @@ function orderFilter(req, res, next) {
 
 var regular_item = function(data) {
 	var list = {};
-	data.map((item)=>{
+	data.map((item) => {
 		var d = {
 			'id': item.id,
 			'name': item.name,
@@ -72,7 +72,7 @@ var regular_item = function(data) {
 		}
 		if (list[item.type_name]) {
 			list[item.type_name].push(d)
-		}else {
+		} else {
 			list[item.type_name] = [];
 			list[item.type_name].push(d)
 		}
@@ -109,7 +109,7 @@ app.get("/", checkLogin, function(req,res,next){
 app.get('/login', function(req, res) {
 	if (!req.session.username) {
 		res.render('login', {})
-	}else {
+	} else {
 		res.redirect('/')
 	}
 })
@@ -161,14 +161,58 @@ app.get('/create/history', checkLogin, function(req, res)
 })
 
 app.get('/create/history/:id', checkLogin, checkIdentity_event, function(req, res) {
+	let queryByItem, sumByItem = 0;
+	
 	db.selectEventDtalById([req.params.id, req.session.myid], (results) => {
-		let sum = 0
-		for (var i in results) {
-			results[i].total = results[i].count * results[i].price;
-			sum += results[i].total;
-		}	
-		res.render('create_history_event', {list:results, sum});
+		for(var i in results) 
+		{
+	    	results[i].total = results[i].count * results[i].price;
+	        sumByItem += results[i].total;
+		}   
+		queryByItem = results;	
 	})
+
+	db.selectEventDtalByUser([req.params.id] , (results) => {
+    	let userTotal = 0;
+        let nowName = results[0].user;
+        
+		for(let i in results) 
+		{
+        	userTotal += results[i].price * results[i].number;
+                
+            //處理sum
+            if(i < results.length-1)
+            {
+                if (results[i].user == results[i*1+1].user)
+                {
+	                results[i].sum = "";
+                }   
+                else
+                {
+                    results[i].sum = `$ ${userTotal}`;
+                    userTotal = 0;
+                }               
+            }
+
+            if (i == results.length -1)
+            {
+                results[i].sum = `$ ${userTotal}`;
+            }
+            //處理sum end
+                
+            //處理name    
+            if (i != 0)
+            {
+   	        	if (results[i].user == nowName)
+                	results[i].user = "";
+                else
+                    nowName = results[i].user;
+            }
+			//處理name end 
+        }
+			      
+		res.render('create_history_event', {listByItem:queryByItem, sumByItem:sumByItem, listByUser: results});
+    })
 });
 
 app.get('/create', checkLogin, function(req, res) {
@@ -244,6 +288,14 @@ app.route('/order/:event_id')
 })
 
 
+app.get('/create_menu', checkLogin, (req, res) => {
+	res.render('create_menu')
+})	
+
+
 app.listen(8888, () => {
 	console.log('server up on port 8888')
 })
+
+module.exports = app
+

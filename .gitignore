@@ -1,6 +1,5 @@
 .DS_Store
 node_modules/
 views/test.pug
-config
+config*
 npm-debug.log
-example_sql/

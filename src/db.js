@@ -108,7 +108,19 @@ function selectEventDtalById(params, callback) {
 					       event.account_id = ? 
 					     ) 
 					   )
-					   GROUP BY item.name, item.price;`
+					   GROUP BY item.name, item.price;`;
+	query(sql, params, callback)		   
+} 
+
+function selectEventDtalByUser(params, callback) {
+	
+	let sql = `select a.name user, i.name, i.price, oi.number, oi.order_id 
+	from order_item oi, \`order\` o, account a, item i 
+	where a.id = o.account_id and
+		i.id = oi.item_id and
+		oi.order_id = o.id and
+		oi.order_id in (select id from \`order\` where event_id = ?)`;
+
 	query(sql, params, callback)		   
 } 
 
@@ -130,7 +142,6 @@ function createOrderItem(params, callback) {
 	query(sql, params, callback)
 }
 
-
 module.exports = {
 	start,
 	end,
@@ -145,6 +156,7 @@ module.exports = {
 	selectActiveEvents,
 	selectEventById,
 	selectEventDtalById,
+	selectEventDtalByUser,
 	createEvent,
 	createOrder,
 	createOrderItem
