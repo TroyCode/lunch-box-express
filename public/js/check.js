@@ -12,3 +12,10 @@ function phone_press_key(num){
         document.getElementById('shop_phone').value=num+'-'
     }
 }
+
+module.exports = {
+    check_price_num,
+    check_phone_num,
+    phone_press_key
+  }
+  
