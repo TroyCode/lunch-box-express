@@ -7,7 +7,8 @@ function check_phone_num(phone_num){
     return (phone_check.test(phone_num))
 }
 function phone_press_key(num){
-    if(num.length==2){
+    var num_check = /[0-9]{2}/
+    if(num.length==2 && num_check.test(num)==true){
         document.getElementById('shop_phone').value=num+'-'
     }
 }
