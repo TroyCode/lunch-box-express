@@ -124,6 +124,8 @@ script.
     $('.dele_kinds').click(function(){
         $('#'+list_now).remove()
         $("#menu"+list_now).remove()
+        menu_num.splice(list_now,1)
+        food_num.splice(list_now,1)
     })
 
     $('#go_create_menu').click(function(){
