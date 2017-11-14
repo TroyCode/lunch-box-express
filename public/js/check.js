@@ -47,15 +47,15 @@ function check_function(){
     // console.log(count)
 }
 
-window.onload=function(){
     var time_to_check = setInterval(check_function, 2000)
+
+
+
+
+module.exports = {
+    check_price_num,
+    check_phone_num,
+    phone_up_key,
+    check_word
 }
-
-
-
-// module.exports = {
-//     check_price_num,
-//     check_phone_num,
-//     phone_press_key
-//}
   

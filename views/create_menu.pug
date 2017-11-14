@@ -23,6 +23,7 @@ body
         br
         div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_kinds 新增種類
         div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_food 新增餐點
+        div(style='text-align:center;min-height:15px;min-width:15px').body_div.dele_kinds 刪除所選種類
         br
         div.kind_box
     div.check_box(style='position:fixed;bottom:50px;right:50px;width:200px;height:50px;visibility:hidden')
@@ -115,12 +116,17 @@ script.
             this_phone.style.color='black';
         }
     }); 
-
+    //刪除餐點
     $('body').on('click','.dele_btn',function(){
-
         console.log($('#'+this.id).parent('div').remove())
-
     });
+    //刪除種類
+    $('.dele_kinds').click(function(){
+        $('#'+list_now).remove()
+        $("#menu"+list_now).remove()
+        menu_num.splice(list_now,1)
+        food_num.splice(list_now,1)
+    })
 
     $('#go_create_menu').click(function(){
         let data = {};
@@ -152,11 +158,13 @@ script.
             data.list.push(list);
         }
 
-        let a = $.ajax({
+        $.ajax({
             type: 'POST',
             url: "/submitCreateMenu",
             data: data,
-            success: function(result){},
+            success: function(result){
+                location.href = '\\';
+            },
             error: function(result){   
                 let message = result.responseText;
                 message = message.slice(message.search("<pre>Error:")+5);
@@ -165,6 +173,4 @@ script.
                 return false;
             }
         });
-
-        a.then(location.href = '\\').catch;
     })

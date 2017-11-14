@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, 'public')))
 app.set('views', path.join(__dirname, 'views'))
 app.use(session({ secret: 'I_AM_5ECRE7', resave: true, saveUninitialized: false, 
 	cookie: { path: '/', httpOnly: true, maxAge: null }}))
-
+const timeZone = new Date().getTimezoneOffset()*-60;
 db.start()
 
 const TIME_OFFSET = {
@@ -140,13 +140,13 @@ app.post('/login', function(req, res) {
 })
 
 app.get('/order/history', checkLogin, function(req, res) {
-	db.selectOrdHisByAcctId([req.session.myid], (result) => {
+	db.selectOrdHisByAcctId([req.session.myid, timeZone], (result) => {
 		res.render('history', {list:result})
 	})
 })
 
 app.get('/order/history/:id', checkLogin, checkIdentity_order, function(req, res) {
-	db.selectOrdByOrdId(req.params.id, (result) => {
+	db.selectOrdByOrdId([req.params.id, timeZone], (result) => {
 		res.render('history_detail', {list:result})
 	})
 })
@@ -155,8 +155,8 @@ app.get('/create/history', checkLogin, function(req, res)
 {
 	db.selectHisByAccId(req.session.myid, results => {
 		results = results.map(result => {
-			result.start_time = formatUnixTime(result.start_time)
-			result.end_time = formatUnixTime(result.end_time)
+			result.start_time = formatUnixTime(result.start_time+timeZone)
+			result.end_time = formatUnixTime(result.end_time+timeZone)
 			return result
 		})
 		res.render('create_history', {list: results})
@@ -347,6 +347,7 @@ app.post('/submitCreateMenu', checkLogin, (req, res) => {
 			})
 		}
 	})
+	res.end();
 })
 
 app.listen(PORT, () => {
