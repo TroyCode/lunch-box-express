@@ -12,7 +12,7 @@ body
             input(type='text',style='display:inline-block;min-width:200px;')#shop_name
             br
             span 店家電話：
-            input(type='text',style='display:inline-block;min-width:200px' onkeyup='phone_press_key(this.value)')#shop_phone
+            input(type='text',style='display:inline-block;min-width:200px;margin:0 auto;' onkeyup='phone_up_key(this.value)')#shop_phone
             span(style='text-align:left') ex.12-34567890
             br
             sqan 店家地址：
@@ -22,7 +22,9 @@ body
         div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_kinds 新增種類
         div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_food 新增餐點
         br
-        div.kind_box 
+        div.kind_box
+    div.check_box(style='position:fixed;bottom:50px;right:50px;border:1px solid black;width:200px;height:50px;visibility:hidden')
+        span(style='color:red') 您還有欄位填錯/未填
 script.
     let menu_num = []
     let food_num = []
