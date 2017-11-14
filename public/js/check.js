@@ -55,6 +55,7 @@ function check_function(){
 module.exports = {
     check_price_num,
     check_phone_num,
-    phone_up_key
+    phone_up_key,
+    check_word
 }
   

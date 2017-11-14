@@ -23,6 +23,7 @@ body
         br
         div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_kinds 新增種類
         div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_food 新增餐點
+        div(style='text-align:center;min-height:15px;min-width:15px').body_div.dele_kinds 刪除所選種類
         br
         div.kind_box
     div.check_box(style='position:fixed;bottom:50px;right:50px;width:200px;height:50px;visibility:hidden')
@@ -115,12 +116,15 @@ script.
             this_phone.style.color='black';
         }
     }); 
-
+    //刪除餐點
     $('body').on('click','.dele_btn',function(){
-
         console.log($('#'+this.id).parent('div').remove())
-
     });
+    //刪除種類
+    $('.dele_kinds').click(function(){
+        $('#'+list_now).remove()
+        $("#menu"+list_now).remove()
+    })
 
     $('#go_create_menu').click(function(){
         let data = {};
