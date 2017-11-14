@@ -1,9 +1,12 @@
+const PORT = process.env.port || 8888
+
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser')
 var session = require('express-session')
 var db = require('./src/db')
 var app = express()
+var check = require('./src/check')
 
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -292,9 +295,62 @@ app.get('/create_menu', checkLogin, (req, res) => {
 	res.render('create_menu')
 })	
 
+app.post('/submitCreateMenu', checkLogin, (req, res) => {
+	let data = req.body;
+	let shopName = data.shopName.trim();
+	let shopTel = data.shopTel.trim();
+	let shopAddress = data.shopAddress.trim();
 
-app.listen(8888, () => {
-	console.log('server up on port 8888')
+	if (shopName.length == 0)
+		throw new Error("店名值為空");
+	if (shopTel.length == 0)
+		throw new Error("店家電話值為空");
+	if (!check.check_phone_num(shopTel))
+		throw new Error("店家電話錯誤");
+	if (shopAddress.length == 0)
+		throw new Error("店家地址為空");
+	if (data.list == undefined)
+		throw new Error("請新增菜單資料");
+
+	let list = data.list;
+	for(let i = 0; i<list.length; i++)
+	{
+		if (list[i].type.length == 0)
+			throw new Error(`第${i+1}項種類名為空`);
+
+		if (list[i].drink == undefined)
+			throw new Error(`${list[i].type} 沒有新增菜單`);
+		
+		for (let j = 0; j < list[i].drink.length; j++){
+			if(list[i].drink[j].name.trim().length ==0)
+				throw new Error(`${list[i].type} 第${j+1} 項菜單沒有菜單名`);
+			if(list[i].drink[j].price.trim().length ==0)
+				throw new Error(`${list[i].type} ${list[i].drink[j].name}沒有價格`);
+		}	
+	}
+
+	//如果以上都檢查正確，下面開始insert db
+	
+	db.createRestaurant([shopName,shopAddress,shopTel], null);
+	
+	let restaurantID;
+	db.selectMaxRestaurantId(null, ID =>{
+		restaurantID = ID[0].restaurantID;
+
+		for(let i = 0; i<list.length; i++)
+		{		
+			db.createItemType([list[i].type], result=>{
+				for(let j = 0; j < list[i].drink.length; j++)
+				{
+					db.createItem([list[i].drink[j].name.trim(), list[i].drink[j].price.trim(), result.insertId, restaurantID], null);
+				}	
+			})
+		}
+	})
+})
+
+app.listen(PORT, () => {
+	console.log(`server up on port ${PORT}`)
 })
 
 module.exports = app

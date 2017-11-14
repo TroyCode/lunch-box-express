@@ -1,22 +1,24 @@
 head
     script(src='https://code.jquery.com/jquery-3.2.1.min.js')
     script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.js')
+    script(src='../js/check.js')
     link(rel='stylesheet', href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css")
     link(rel='stylesheet', type='text/css', href='../css/main.css')
     script(src='../js/check.js')
 body
     include overview.pug
-    form(method='POST',action='',name='create_menu',id='create_menu')
-        div(style='width:300px;text-align:right;display:inline-block')
+    #create_menu
+        div(name='create_menu',style='width:300px;text-align:right;display:inline-block')
             sqan  店名：
             input(type='text',style='display:inline-block;min-width:200px;')#shop_name
             br
-            span 店家電話：
+            sqan 店家電話
             input(type='text',style='display:inline-block;min-width:200px;margin:0 auto;' onkeyup='phone_up_key(this.value)')#shop_phone
             span(style='text-align:left') ex.12-34567890
             br
-            sqan 店家地址：
+            sqan 店家地址
             input(type='text',style='display:inline-block;min-width:200px')#shop_address
+            br
         button#go_create_menu 確定
         br
         div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_kinds 新增種類
@@ -36,7 +38,7 @@ script.
         menu_num[menu_num.length]=0
         $('.create_food_menu').hide();
         $("<input/>", {
-            "class": "kinds_num",
+            "class": "kinds_num kinds"+list_now,
             "id":list_now,
             "style":'min-width:50px;display:inline-block',
             "placeholder":"請輸入種類",
@@ -52,9 +54,8 @@ script.
     })
     //新增餐點
     function plus_food(){
-       
         $('<div/>',{
-            "id":"menu"+list_now+"box"+food_num[list_now]
+            "id":"menu"+list_now+"box"+food_num[list_now],
         }).appendTo("#menu"+list_now)
          $("<br/>", {
         }).appendTo("#menu"+list_now+"box"+food_num[list_now]);
@@ -62,7 +63,7 @@ script.
             "text": "餐點名稱:"
         }).appendTo("#menu"+list_now+"box"+food_num[list_now]);
         $("<input/>", {
-            "class": "food_name",
+            "class": "food_name foods"+list_now,
             "id": "menu"+list_now+"_food"+food_num[list_now],
             'style':'display:inline-block',
             "type":"text",
@@ -72,7 +73,7 @@ script.
             "text": "餐點價格:"
         }).appendTo("#menu"+list_now+"box"+food_num[list_now]);
         $("<input/>", {
-            "class": "food_price",
+            "class": "food_price prices"+list_now,
             "id": "menu"+list_now+"_price"+food_num[list_now],
             'style':'display:inline-block',
             "type":"number",
@@ -99,7 +100,6 @@ script.
     //輸入價錢
     $("form").on("change",".food_price",function () {
         var this_price = document.getElementById(this.id);
-        console.log(check_price_num(this_price.value))
         if(check_price_num(this_price.value)==false){
             this_price.style.color='red';
         }else if (check_price_num(this_price.value)==true){
@@ -123,17 +123,48 @@ script.
     });
 
     $('#go_create_menu').click(function(){
-        //- let menu_name=document.querySelectorAll('.kinds_num')
-        //- let food_name=document.querySelectorAll('.food_name')
-        //- let food_price=document.querySelectorAll('.food_price')
-        //- for(var i=0;i<menu_name.length;i++){
+        let data = {};
+        data.shopName = document.querySelector('#shop_name').value;
+        data.shopTel = document.querySelector('#shop_phone').value;
+        data.shopAddress = document.querySelector('#shop_address').value;
+        data.list =[]
+    
+        let kinds = document.querySelectorAll(".kinds_num");
 
-        //- }
-        //- for(var i=0;i<food_name.length;i++){
-        //-     console.log('餐點名稱：'+food_name[i].value+'價格：'+food_price[i].value)
-        //- }
-        //- return false
+        for (let i = 0; i < kinds.length; i++)
+        {
+            let food = document.querySelectorAll('.foods'+i);
+            let price = document.querySelectorAll('.prices'+i);
 
-        
+            let list = {};
+            list.type = kinds[i].value;
+            list.drink = [];
 
+            for (let x = 0; x < food.length; x++)
+            {
+                let drink = {};
+                drink.name = food[x].value;
+                drink.price = price[x].value;
+                
+                list.drink.push(drink);
+            }
+
+            data.list.push(list);
+        }
+
+        let a = $.ajax({
+            type: 'POST',
+            url: "/submitCreateMenu",
+            data: data,
+            success: function(result){},
+            error: function(result){   
+                let message = result.responseText;
+                message = message.slice(message.search("<pre>Error:")+5);
+                message = message.slice(0, message.search("<br>"));
+                alert(message);
+                return false;
+            }
+        });
+
+        a.then(location.href = '\\').catch;
     })
