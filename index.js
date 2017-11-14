@@ -1,3 +1,5 @@
+const PORT = process.env.port || 8888
+
 var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser')
@@ -110,7 +112,7 @@ app.get("/", checkLogin, function(req,res,next){
 app.get('/login', function(req, res) {
 	if (!req.session.username) {
 		res.render('login', {})
-	}else {
+	} else {
 		res.redirect('/')
 	}
 })
@@ -347,8 +349,8 @@ app.post('/submitCreateMenu', checkLogin, (req, res) => {
 	})
 })
 
-app.listen(8888, () => {
-	console.log('server up on port 8888')
+app.listen(PORT, () => {
+	console.log(`server up on port ${PORT}`)
 })
 
 module.exports = app

@@ -8,3 +8,7 @@ function time_back(){
     var output = d.getFullYear() + '-' +(month<10 ? '0' : '') + month + '-' +(day<10 ? '0' : '') + day+'T'+hour+':30';
     return output;    
 }   
+module.exports = {
+    time_back
+  }
+  
