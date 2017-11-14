@@ -21,6 +21,9 @@ function query(sql, params, callback) {
 			throw err
 		}
 		else {
+			if (callback === null)
+				return;
+			//console.log(result);
 			callback(result)
 		}
 	})
@@ -61,7 +64,7 @@ function selectHisByAccId(params, callback) {
 }
 
 function selectOrdHisByAcctId(params, callback) {
-	let sql = `SELECT \`order\`.id, restaurant.name, DATE_FORMAT(FROM_UNIXTIME(timestamp),'%Y/%c/%d %H:%i:%S') timestamp
+	let sql = `SELECT \`order\`.id, restaurant.name, DATE_FORMAT(FROM_UNIXTIME(timestamp+${params[1]}),'%Y/%c/%d %H:%i:%S') timestamp
 						 FROM \`order\`, event, restaurant
 						 WHERE event.restaurant_id = restaurant.id AND
 						 \`order\`.event_id = event.id AND
@@ -142,6 +145,34 @@ function createOrderItem(params, callback) {
 	query(sql, params, callback)
 }
 
+function createRestaurant(params, callback){
+	let sql = 'INSERT INTO restaurant (name, address, phone) VALUES(?, ?, ?)';
+	query(sql, params, callback);
+}
+
+function createItemType(params, callback){
+	let sql = 'INSERT INTO item_type (name) values(?)'
+	query(sql, params, callback);
+}
+
+function createItem(params, callback){
+	let sql = 'insert into item (name, price, type_id, restaurant_id) values (?, ?, ?, ?)';
+	console.log(params);
+	query(sql, params, callback);
+}
+
+function selectMaxRestaurantId(params, callback){
+	let sql = 'select MAX(id) restaurantID from restaurant';
+
+	query(sql, null, callback);
+}
+
+function selectMaxItemTypeId(params, callback){
+	let sql = 'select MAX(id) itemTypeID from item_type';
+
+	query(sql, null, callback);
+}
+
 module.exports = {
 	start,
 	end,
@@ -159,5 +190,10 @@ module.exports = {
 	selectEventDtalByUser,
 	createEvent,
 	createOrder,
-	createOrderItem
+	createOrderItem,
+	createRestaurant,
+	createItemType,
+	selectMaxItemTypeId,
+	selectMaxRestaurantId,
+	createItem
 }

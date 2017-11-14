@@ -8,9 +8,10 @@ body
     include overview.pug
     p 我要訂......
     p 店名：#{event.res_name}
-    each val,key in menu
-        .body_div
-            span#kind  種類：#{key}
+    div(style='width:850px;height:200px;overflow:scroll;')
+        each val,key in menu
+            .body_div(style='margin-left:10px')
+                span#kind  種類：#{key}
     form(method='POST',action='',name='order_detail',id='order_detail')
         each val in menu
             div.food_menu

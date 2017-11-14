@@ -4,11 +4,10 @@
   "description": "lunch",
   "main": "index.js",
   "scripts": {
-    "start": "node .",
+    "start": "forever index.js",
     "start-dev": "nodemon .",
-    "test": "mocha --exit", 
-    "create-table": 
-      "mysql -h ${db_host} -u ${db_user} -p${db_password} ${db_name} < sql/example.sql"
+    "test": "mocha --exit",
+    "create-table": "mysql -h ${db_host} -u ${db_user} -p${db_password} ${db_name} < sql/example.sql"
   },
   "repository": {
     "type": "git",
@@ -28,6 +27,7 @@
     "es6-promise": "^4.1.1",
     "express": "^4.15.5",
     "express-session": "^1.15.6",
+    "forever": "^0.15.3",
     "mysql": "^2.14.1",
     "pug": "^2.0.0-rc.4"
   },
