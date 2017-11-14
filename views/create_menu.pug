@@ -23,7 +23,7 @@ body
         div(style='text-align:center;min-height:15px;min-width:15px').body_div.plus_food 新增餐點
         br
         div.kind_box
-    div.check_box(style='position:fixed;bottom:50px;right:50px;border:1px solid black;width:200px;height:50px;visibility:hidden')
+    div.check_box(style='position:fixed;bottom:50px;right:50px;width:200px;height:50px;visibility:hidden')
         span(style='color:red') 您還有欄位填錯/未填
 script.
     let menu_num = []
@@ -40,7 +40,6 @@ script.
             "id":list_now,
             "style":'min-width:50px;display:inline-block',
             "placeholder":"請輸入種類",
-            "text": "種類"+menu_num.length
         }).appendTo(".kind_box");
         $("<div/>", {
             "class": "create_food_menu",
@@ -53,21 +52,25 @@ script.
     })
     //新增餐點
     function plus_food(){
-        $("<br/>", {
-        }).appendTo("#menu"+list_now);
+       
+        $('<div/>',{
+            "id":"menu"+list_now+"box"+food_num[list_now]
+        }).appendTo("#menu"+list_now)
+         $("<br/>", {
+        }).appendTo("#menu"+list_now+"box"+food_num[list_now]);
         $("<span/>", {
             "text": "餐點名稱:"
-        }).appendTo("#menu"+list_now);
+        }).appendTo("#menu"+list_now+"box"+food_num[list_now]);
         $("<input/>", {
             "class": "food_name",
             "id": "menu"+list_now+"_food"+food_num[list_now],
             'style':'display:inline-block',
             "type":"text",
             "value": ""
-        }).appendTo("#menu"+list_now);
+        }).appendTo("#menu"+list_now+"box"+food_num[list_now]);
         $("<span/>", {
             "text": "餐點價格:"
-        }).appendTo("#menu"+list_now);
+        }).appendTo("#menu"+list_now+"box"+food_num[list_now]);
         $("<input/>", {
             "class": "food_price",
             "id": "menu"+list_now+"_price"+food_num[list_now],
@@ -76,7 +79,13 @@ script.
             "value": "",
             "min":"0",
             "max":"100000"
-        }).appendTo("#menu"+list_now);
+        }).appendTo("#menu"+list_now+"box"+food_num[list_now]);
+        $("<span/>", {
+            "text": "刪除這項",
+            "style":"margin-left:150px",
+            "id":"menu"+list_now+"_dele"+food_num[list_now],
+            "class":"dele_btn"
+        }).appendTo("#menu"+list_now+"box"+food_num[list_now]);
         food_num[list_now]+=1
     }
     //選種類
@@ -107,15 +116,24 @@ script.
         }
     }); 
 
-    $('#go_create_menu').click(function(){
-        let menu_name=document.querySelectorAll('.kinds_num')
-        let food_name=document.querySelectorAll('.food_name')
-        let food_price=document.querySelectorAll('.food_price')
-        for(var i=0;i<menu_name.length;i++){
+    $('body').on('click','.dele_btn',function(){
 
-        }
-        for(var i=0;i<food_name.length;i++){
-            console.log('餐點名稱：'+food_name[i].value+'價格：'+food_price[i].value)
-        }
-        return false
+        console.log($('#'+this.id).parent('div').remove())
+
+    });
+
+    $('#go_create_menu').click(function(){
+        //- let menu_name=document.querySelectorAll('.kinds_num')
+        //- let food_name=document.querySelectorAll('.food_name')
+        //- let food_price=document.querySelectorAll('.food_price')
+        //- for(var i=0;i<menu_name.length;i++){
+
+        //- }
+        //- for(var i=0;i<food_name.length;i++){
+        //-     console.log('餐點名稱：'+food_name[i].value+'價格：'+food_price[i].value)
+        //- }
+        //- return false
+
+        
+
     })

@@ -44,7 +44,7 @@ function check_function(){
     }else if(check_input()<=0){
         check_box[0].style.visibility='hidden'
     }
-    console.log(count)
+    // console.log(count)
 }
 
 window.onload=function(){
@@ -53,9 +53,9 @@ window.onload=function(){
 
 
 
-module.exports = {
-    check_price_num,
-    check_phone_num,
-    phone_press_key
-  }
+// module.exports = {
+//     check_price_num,
+//     check_phone_num,
+//     phone_press_key
+//}
   
