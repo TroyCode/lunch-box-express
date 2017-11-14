@@ -152,11 +152,13 @@ script.
             data.list.push(list);
         }
 
-        let a = $.ajax({
+        $.ajax({
             type: 'POST',
             url: "/submitCreateMenu",
             data: data,
-            success: function(result){},
+            success: function(result){
+                location.href = '\\';
+            },
             error: function(result){   
                 let message = result.responseText;
                 message = message.slice(message.search("<pre>Error:")+5);
@@ -165,6 +167,4 @@ script.
                 return false;
             }
         });
-
-        a.then(location.href = '\\').catch;
     })

@@ -347,6 +347,7 @@ app.post('/submitCreateMenu', checkLogin, (req, res) => {
 			})
 		}
 	})
+	res.end();
 })
 
 app.listen(PORT, () => {
