@@ -59,7 +59,7 @@ function selectResNameByResId(params, callback) {
 function selectHisByAccId(params, callback) {
 	let sql = 'SELECT e.id, r.name, e.start_time, e.end_time \
 	           FROM event e, restaurant r \
-	           WHERE e.account_id = ?;'
+	           WHERE e.account_id = ? and e.restaurant_id = r.id;'
 	query(sql, params, callback)
 }
 
