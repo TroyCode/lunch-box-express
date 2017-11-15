@@ -26,11 +26,22 @@ html
             location.href = "/order/history/" + event.target.parentNode.id;
         });
 
-        let date = new Date().getTimezoneOffset()*-60000;
         let timeQuery = document.querySelectorAll(".time");
         for (let d of timeQuery)
         {
           timeData = d.innerHTML;
-          let a = new Date(timeData*1000);
-          d.innerHTML = a;
+          let date = formatUnixTime(timeData);
+          d.innerHTML = date;
         }
+
+      function formatUnixTime(ut) {
+        let d = new Date(ut*1000);
+        let year   = d.getFullYear();
+        let month  = d.getMonth();
+        let date   = d.getDate();
+        let hour   = d.getHours();
+        let minute = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
+        let second = d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds();
+        console.log(`${year}-${month}-${date} ${hour}:${minute}:${second}`);
+        return `${year}-${month}-${date} ${hour}:${minute}:${second}`;
+      }
