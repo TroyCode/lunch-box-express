@@ -18,7 +18,7 @@ html
         tr(id=val.id)
           td(width='5%') #{i++}
           td(width='50%') #{val.name}
-          td(width='30%') #{new Date(val.timestamp*1000)}
+          td(width='30%').time #{val.timestamp}
           
 
     script.
@@ -26,5 +26,11 @@ html
             location.href = "/order/history/" + event.target.parentNode.id;
         });
 
-        let date = new Date().getTimezoneOffset();
-        console.log(date);
+        let date = new Date().getTimezoneOffset()*-60000;
+        let timeQuery = document.querySelectorAll(".time");
+        for (let d of timeQuery)
+        {
+          timeData = d.innerHTML;
+          let a = new Date(timeData*1000+date);
+          d.innerHTML = a;
+        }
