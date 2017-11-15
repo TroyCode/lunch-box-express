@@ -18,10 +18,30 @@ html
         tr(id=val.id)
           td(width='5%') #{i++}
           td(width='50%') #{val.name}
-          td(width='30%') #{val.timestamp}
+          td(width='30%').time #{val.timestamp}
           
 
     script.
         document.querySelector("#tableContent").addEventListener("click", function(event){
             location.href = "/order/history/" + event.target.parentNode.id;
         });
+
+        let timeQuery = document.querySelectorAll(".time");
+        for (let d of timeQuery)
+        {
+          timeData = d.innerHTML;
+          let date = formatUnixTime(timeData);
+          d.innerHTML = date;
+        }
+
+      function formatUnixTime(ut) {
+        let d = new Date(ut*1000);
+        let year   = d.getFullYear();
+        let month  = d.getMonth();
+        let date   = d.getDate();
+        let hour   = d.getHours() < 10 ? '0' + d.getHours() : d.getHours();
+        let minute = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
+        let second = d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds();
+        console.log(`${year}-${month}-${date} ${hour}:${minute}:${second}`);
+        return `${year}-${month}-${date} ${hour}:${minute}:${second}`;
+      }

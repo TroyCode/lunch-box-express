@@ -59,12 +59,12 @@ function selectResNameByResId(params, callback) {
 function selectHisByAccId(params, callback) {
 	let sql = 'SELECT e.id, r.name, e.start_time, e.end_time \
 	           FROM event e, restaurant r \
-	           WHERE e.account_id = ?;'
+	           WHERE e.account_id = ? and e.restaurant_id = r.id;'
 	query(sql, params, callback)
 }
 
 function selectOrdHisByAcctId(params, callback) {
-	let sql = `SELECT \`order\`.id, restaurant.name, DATE_FORMAT(FROM_UNIXTIME(timestamp+${params[1]}),'%Y/%c/%d %H:%i:%S') timestamp
+	let sql = `SELECT \`order\`.id, restaurant.name, timestamp
 						 FROM \`order\`, event, restaurant
 						 WHERE event.restaurant_id = restaurant.id AND
 						 \`order\`.event_id = event.id AND
