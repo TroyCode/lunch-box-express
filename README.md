@@ -1,4 +1,4 @@
-簡易訂便當系統，需要 [Node.js v6](https://nodejs.org/en/download/package-manager/) 以上, MySQL 及 npm
+簡易訂便當系統，需要 [Node.js v6](https://nodejs.org/en/download/package-manager/) 以上及 MySQL
 
 ## Getting start
 
@@ -22,7 +22,12 @@ export db_host='DB location'
 export db_user='DB username'
 export db_password='DB password'
 export db_name='Schema name'
-export db_port='DB port'
+```
+
+初始化資料庫
+
+```
+npm run create-table
 ```
 
 編輯好之後執行

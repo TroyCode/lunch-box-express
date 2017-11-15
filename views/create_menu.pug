@@ -122,10 +122,14 @@ script.
     });
     //刪除種類
     $('.dele_kinds').click(function(){
-        $('#'+list_now).remove()
+        //- $('#'+list_now).remove()
+        //- menu_num.splice(list_now,1)
+        //- food_num.splice(list_now,1)
+        $('#'+list_now).hide()
         $("#menu"+list_now).remove()
-        menu_num.splice(list_now,1)
-        food_num.splice(list_now,1)
+        menu_num[list_now]='1'
+
+
     })
 
     $('#go_create_menu').click(function(){
@@ -139,23 +143,21 @@ script.
 
         for (let i = 0; i < kinds.length; i++)
         {
+            if(menu_num[i]!='1'){
             let food = document.querySelectorAll('.foods'+i);
             let price = document.querySelectorAll('.prices'+i);
-
             let list = {};
             list.type = kinds[i].value;
             list.drink = [];
-
             for (let x = 0; x < food.length; x++)
             {
                 let drink = {};
                 drink.name = food[x].value;
                 drink.price = price[x].value;
-                
                 list.drink.push(drink);
             }
-
             data.list.push(list);
+            }
         }
 
         $.ajax({
