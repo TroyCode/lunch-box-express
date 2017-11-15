@@ -25,3 +25,6 @@ html
         document.querySelector("#tableContent").addEventListener("click", function(event){
             location.href = "/order/history/" + event.target.parentNode.id;
         });
+
+        let date = new Date().getTimezoneOffset();
+        console.log(date);
