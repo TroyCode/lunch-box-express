@@ -28,7 +28,7 @@ html
       let startTime = document.querySelectorAll(".startTime");
       let endTime = document.querySelectorAll(".endTime");
       
-      for (let x in startTime)
+      for (let x = 0; x < startTime.length; x++)
       {
         let timeData = startTime[x].innerHTML;
         let date = formatUnixTime(timeData);
