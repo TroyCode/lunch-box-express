@@ -85,8 +85,8 @@ body
                         "CANCEL": function() { $(this).dialog("close"); }
                         }       
                     });
-                //當有 input 標籤的按鈕被選擇的時候
-            $('input').click(function(){
+
+            function input_menu(){
                 let out = ['您所選的餐點<br>'];
                 let price = [];
                 let o_num =document.querySelectorAll(".o_num");
@@ -105,7 +105,14 @@ body
                 }
                 out.push('小計：'+final_price);
                 $('#what_you_order').html(out);
+            }
+                //當有 input 標籤的按鈕被選擇的時候
+            $('input').keyup(function(){
+               input_menu()
 
+            });
+            $('input').click(function(){
+               input_menu()
             });
                 
         });

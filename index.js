@@ -313,6 +313,7 @@ app.post('/submitCreateMenu', checkLogin, (req, res) => {
 		throw new Error("請新增菜單資料");
 
 	let list = data.list;
+	console.log(data.list)
 	for(let i = 0; i<list.length; i++)
 	{
 		if (list[i].type.length == 0)
