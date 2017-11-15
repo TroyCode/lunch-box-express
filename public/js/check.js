@@ -22,16 +22,20 @@ function check_word(word){
 function check_input(){
     let check_input = document.querySelectorAll('input')
     var max = 0;
+    var count = 0;
     for(var i = 0 ;i<check_input.length;i++){
-        //input 檢查顏色
-        if(check_input[i].style.color=='red')
+        //input 檢查顏色 &&  //每個input.value去頭去尾空格檢查
+        if(check_input[i].style.color=='red' || check_word( check_input[i].value.trim() ) !=true )
         {
             max++
         }
-        //每個input.value去頭去尾空格檢查
-        if( check_word( check_input[i].value.trim() ) !=true )
-        {
-            max++
+        count ++;
+    }
+
+    let kinds = document.querySelectorAll(".kinds_num");
+    for (let i = 0; i < kinds.length; i++){
+        if(menu_num[i]=="1"){
+            max=max-1
         }
     }
     return max

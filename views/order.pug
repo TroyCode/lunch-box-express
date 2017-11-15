@@ -22,7 +22,7 @@ body
                         input(name=k.id, type='number' class="o_num" value=0 min=0 max =90 ,style="display:inline")
                         br.
         button#go_order_detail 確定
-            #dialog-confirm #{event.org_name} 你確定要 #{event.res_name} 以下餐點嗎?
+            #dialog-confirm #{session.username} 你確定要 #{event.res_name} 以下餐點嗎?
                 p#s
     h5#what_you_order(style='position:fixed;top:50px;right:50px;min-width:250px;border: 2px solid black;display:inline-block;height:auto;margin:50 50;min-height:100px;') 
         |您所選的餐點
@@ -85,8 +85,8 @@ body
                         "CANCEL": function() { $(this).dialog("close"); }
                         }       
                     });
-                //當有 input 標籤的按鈕被選擇的時候
-            $('input').click(function(){
+
+            function input_menu(){
                 let out = ['您所選的餐點<br>'];
                 let price = [];
                 let o_num =document.querySelectorAll(".o_num");
@@ -105,7 +105,14 @@ body
                 }
                 out.push('小計：'+final_price);
                 $('#what_you_order').html(out);
+            }
+                //當有 input 標籤的按鈕被選擇的時候
+            $('input').keyup(function(){
+               input_menu()
 
+            });
+            $('input').click(function(){
+               input_menu()
             });
                 
         });
