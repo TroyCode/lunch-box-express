@@ -31,6 +31,6 @@ html
         for (let d of timeQuery)
         {
           timeData = d.innerHTML;
-          let a = new Date(timeData*1000+date);
+          let a = new Date(timeData*1000);
           d.innerHTML = a;
         }
