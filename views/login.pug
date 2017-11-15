@@ -1,9 +1,10 @@
-doctype html
 html
   head
-
-  body
-    form(name='login', method='POST', action='login')
-      input(name='username')
-      input(type='password',name='password')
-      input(type='submit')
+    title 好想訂便當
+  body(style='position:absolute;width:100%;height:100%')
+    form(name='login', method='POST', action='login',style='position:absolute;border:2px solid black;padding:7.5% 17.5%;margin-top:20%;margin-left:25%;text-align:center;')
+      input(name='username',placeholder="帳號名稱",style='border:2px solid black')
+      br
+      input(type='password',name='password',placeholder="密碼",style='border:2px solid black;margin-top:5px')
+      br
+      input(type='submit',style='width:55px;margin-top:5px')
