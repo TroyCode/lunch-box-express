@@ -18,7 +18,7 @@ html
         tr(id=val.id)
           td(width='5%') #{i++}
           td(width='50%') #{val.name}
-          td(width='30%') #{val.timestamp}
+          td(width='30%') #{new Date(val.timestamp*1000)}
           
 
     script.
