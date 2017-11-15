@@ -153,11 +153,6 @@ app.get('/order/history/:id', checkLogin, checkIdentity_order, function(req, res
 app.get('/create/history', checkLogin, function(req, res)
 {
 	db.selectHisByAccId(req.session.myid, results => {
-		results = results.map(result => {
-			result.start_time = formatUnixTime(result.start_time)
-			result.end_time = formatUnixTime(result.end_time)
-			return result
-		})
 		res.render('create_history', {list: results})
 	})
 })

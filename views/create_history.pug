@@ -17,10 +17,36 @@ html
         tr(id=val.id)
           td(width='5%') #{i++}
           td(width='35%') #{val.name}
-          td(width='30%') #{val.start_time}
-          td(width='30%') #{val.end_time}
+          td(width='30%').startTime #{val.start_time}
+          td(width='30%').endTime #{val.end_time}
 
     script.
         document.querySelector("#tableContent").addEventListener("click", function(event){
             location.href = "/create/history/" + event.target.parentNode.id;
         });
+    
+      let startTime = document.querySelectorAll(".startTime");
+      let endTime = document.querySelectorAll(".endTime");
+      
+      for (let x = 0; x < startTime.length; x++)
+      {
+        let timeData = startTime[x].innerHTML;
+        let date = formatUnixTime(timeData);
+        startTime[x].innerHTML = date;
+
+        timeData = endTime[x].innerHTML;
+        date = formatUnixTime(timeData);
+        endTime[x].innerHTML = date;
+      }
+
+      function formatUnixTime(ut) {
+        let d = new Date(ut*1000);
+        let year   = d.getFullYear();
+        let month  = d.getMonth();
+        let date   = d.getDate();
+        let hour   = d.getHours() < 10 ? '0' + d.getHours() : d.getHours();
+        let minute = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
+        let second = d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds();
+        console.log(`${year}-${month}-${date} ${hour}:${minute}:${second}`);
+        return `${year}-${month}-${date} ${hour}:${minute}:${second}`;
+      }
