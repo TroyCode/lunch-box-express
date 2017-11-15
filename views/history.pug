@@ -39,7 +39,7 @@ html
         let year   = d.getFullYear();
         let month  = d.getMonth();
         let date   = d.getDate();
-        let hour   = d.getHours();
+        let hour   = d.getHours() < 10 ? '0' + d.getHours() : d.getHours();
         let minute = d.getMinutes() < 10 ? '0' + d.getMinutes() : d.getMinutes();
         let second = d.getSeconds() < 10 ? '0' + d.getSeconds() : d.getSeconds();
         console.log(`${year}-${month}-${date} ${hour}:${minute}:${second}`);
